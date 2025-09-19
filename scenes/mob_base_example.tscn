@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://k4w3q51t2sgy"]
+
+[ext_resource type="PackedScene" uid="uid://dref11tiomsux" path="res://scenes/server_sync.tscn" id="1_7cwgn"]
+[ext_resource type="PackedScene" uid="uid://b0ax6ksb4fnbw" path="res://scenes/base_ui.tscn" id="2_61wy7"]
+
+[node name="mobBaseExample" type="Node2D"]
+
+[node name="BaseUI" parent="." instance=ExtResource("2_61wy7")]
+offset_left = 547.0
+offset_top = 309.0
+offset_right = 547.0
+offset_bottom = 309.0
+metadata/_edit_use_anchors_ = true
+
+[node name="ServerSync" parent="." instance=ExtResource("1_7cwgn")]
