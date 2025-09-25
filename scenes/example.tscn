@@ -1,5 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://cj3ofmycfth6y"]
+[gd_scene load_steps=6 format=3 uid="uid://cj3ofmycfth6y"]
 
+[ext_resource type="PackedScene" uid="uid://dvoy803okt3k5" path="res://scenes/slime.tscn" id="1_aoc7i"]
 [ext_resource type="PackedScene" uid="uid://b0ax6ksb4fnbw" path="res://scenes/base_ui.tscn" id="1_o34ws"]
 [ext_resource type="Script" uid="uid://cxgr8psjqal6a" path="res://scripts/multiplayer/multiplayer_spawner.gd" id="2_pssa7"]
 [ext_resource type="PackedScene" uid="uid://dref11tiomsux" path="res://scenes/server_sync.tscn" id="2_ucs8h"]
@@ -20,3 +21,6 @@ _spawnable_scenes = PackedStringArray("uid://v3d1ogl7dbfk")
 spawn_path = NodePath("..")
 script = ExtResource("2_pssa7")
 network_player = ExtResource("3_7w8s4")
+
+[node name="Slime" parent="." instance=ExtResource("1_aoc7i")]
+position = Vector2(120, 235)
