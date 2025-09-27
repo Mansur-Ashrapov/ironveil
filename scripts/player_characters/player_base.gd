@@ -81,8 +81,8 @@ func _handle_move_input() -> void:
 	direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if last_direction == Vector2.ZERO and direction == Vector2.ZERO or last_direction == direction: return
 	elif not can_move: 
-			update_move_input.rpc_id(1, Vector2.ZERO)
-			last_direction = direction
+		update_move_input.rpc_id(1, Vector2.ZERO)
+		last_direction = direction
 	update_move_input.rpc_id(1, direction)
 	changed_direction.emit(direction)
 	last_direction = direction

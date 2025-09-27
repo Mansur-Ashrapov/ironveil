@@ -89,9 +89,6 @@ script = ExtResource("1_5l5im")
 animation_controller = NodePath("AnimationPlayer")
 sprite = NodePath("Char-sheet")
 abilities = [ExtResource("2_hc1dv")]
-max_health = null
-max_stamina = null
-max_mana = null
 
 [node name="Char-sheet" type="Sprite2D" parent="."]
 scale = Vector2(10, 10)
