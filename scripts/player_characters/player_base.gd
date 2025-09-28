@@ -37,7 +37,6 @@ var state_buffer := [] # Буффер передвижений игрока
 func _ready() -> void:
 	# Добавляем игрока в группу для легкого поиска
 	add_to_group("players")
-	add_to_group("network_players")
 	
 	get_hit.connect(animation_controller.on_get_hit)
 	used_ability.connect(animation_controller.on_ability_used)
