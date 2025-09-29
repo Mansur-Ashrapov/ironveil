@@ -52,7 +52,7 @@ animations = [{
 "texture": SubResource("AtlasTexture_vnioy")
 }],
 "loop": true,
-"name": &"hit",
+"name": &"damage",
 "speed": 5.0
 }, {
 "frames": [{
@@ -83,7 +83,7 @@ script = ExtResource("1_p2gj0")
 position = Vector2(1.5258789e-05, 1.5258789e-05)
 scale = Vector2(5.90625, 5.90625)
 sprite_frames = SubResource("SpriteFrames_v5wyi")
-animation = &"hit"
+animation = &"damage"
 autoplay = "idle"
 
 [node name="Killzone" parent="." instance=ExtResource("3_n6pvg")]
