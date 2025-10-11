@@ -4,7 +4,8 @@ class_name Sword
 var sword_scene: PackedScene = preload("res://scenes/sword_test.tscn")
 
 func _on_use(user: PlayerBase):
-	var sword: Sprite2D = sword_scene.instantiate()
+	var sword: SwordTest = sword_scene.instantiate()
+	sword.get_ready(user.base_damage)
 	user.add_child(sword)
 	sword.flip_h = user.sprite.flip_h
 	if user.direction != Vector2.ZERO:

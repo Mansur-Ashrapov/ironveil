@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://v3d1ogl7dbfk"]
+[gd_scene load_steps=14 format=3 uid="uid://v3d1ogl7dbfk"]
 
 [ext_resource type="Script" uid="uid://cxujnvfnqx5w3" path="res://scripts/player_characters/player_base.gd" id="1_5l5im"]
 [ext_resource type="Texture2D" uid="uid://cadmsq53mptb0" path="res://assets/sheet.png" id="2_dtrl1"]
 [ext_resource type="Script" uid="uid://bgtt12tk47epa" path="res://scripts/abilities/swordTest/sword_ability.gd" id="2_hc1dv"]
 [ext_resource type="Script" uid="uid://cx62di5gmvb48" path="res://scripts/player_characters/player_base_animation_controller.gd" id="3_dtrl1"]
+[ext_resource type="PackedScene" uid="uid://buyios2xjnnn4" path="res://scenes/player_ui.tscn" id="3_rhx3x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_27uls"]
 size = Vector2(60, 71)
@@ -74,21 +75,45 @@ tracks/0/keys = {
 [sub_resource type="Animation" id="Animation_dtrl1"]
 resource_name = "new_animation"
 
+[sub_resource type="Animation" id="Animation_5lknd"]
+resource_name = "get_hit"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Char-sheet:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [7]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_hc1dv"]
 _data = {
 &"RESET": SubResource("Animation_kfj5c"),
 &"ability0": SubResource("Animation_rhx3x"),
+&"get_hit": SubResource("Animation_5lknd"),
 &"idle": SubResource("Animation_hquwp"),
 &"moving": SubResource("Animation_hc1dv"),
 &"new_animation": SubResource("Animation_dtrl1")
 }
 
-[node name="NetworkPlayer" type="CharacterBody2D" node_paths=PackedStringArray("animation_controller", "sprite") groups=["players"]]
+[node name="NetworkPlayer" type="CharacterBody2D" node_paths=PackedStringArray("player_ui", "animation_controller", "sprite") groups=["players"]]
 motion_mode = 1
 script = ExtResource("1_5l5im")
+player_ui = NodePath("Control")
 animation_controller = NodePath("AnimationPlayer")
 sprite = NodePath("Char-sheet")
 abilities = [ExtResource("2_hc1dv")]
+
+[node name="Control" parent="." instance=ExtResource("3_rhx3x")]
+offset_left = -576.0
+offset_top = -324.0
+offset_right = -576.0
+offset_bottom = -324.0
 
 [node name="Char-sheet" type="Sprite2D" parent="."]
 scale = Vector2(10, 10)

@@ -1,0 +1,65 @@
+[gd_scene load_steps=3 format=3 uid="uid://ckc5nxrmdil2e"]
+
+[ext_resource type="Script" uid="uid://0jtoqbv82fcs" path="res://scripts/player_characters/player_ui.gd" id="1_jkj6h"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_guxnq"]
+font_size = 30
+
+[node name="Control" type="Control" node_paths=PackedStringArray("hp", "st", "mp", "ep", "lvl")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jkj6h")
+hp = NodePath("hp")
+st = NodePath("mp")
+mp = NodePath("sp")
+ep = NodePath("ep")
+lvl = NodePath("lvl")
+
+[node name="hp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 405.0
+offset_right = 86.0
+offset_bottom = 447.0
+text = "HP:"
+label_settings = SubResource("LabelSettings_guxnq")
+
+[node name="mp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 447.0
+offset_right = 86.0
+offset_bottom = 489.0
+text = "MP:"
+label_settings = SubResource("LabelSettings_guxnq")
+
+[node name="sp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 489.0
+offset_right = 86.0
+offset_bottom = 531.0
+text = "SP:"
+label_settings = SubResource("LabelSettings_guxnq")
+
+[node name="ep" type="Label" parent="."]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 531.0
+offset_right = 86.0
+offset_bottom = 573.0
+text = "EXP:"
+label_settings = SubResource("LabelSettings_guxnq")
+
+[node name="lvl" type="Label" parent="."]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 573.0
+offset_right = 86.0
+offset_bottom = 615.0
+text = "LVL:"
+label_settings = SubResource("LabelSettings_guxnq")
