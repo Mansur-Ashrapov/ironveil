@@ -23,6 +23,8 @@ HighLevelMultiplayerHandler="*res://scripts/multiplayer/high_level_multiplayer_h
 
 players=""
 server_sync=""
+mob=""
+root=""
 
 [input]
 
