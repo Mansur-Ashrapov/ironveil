@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://cifbbv45im7sl"]
 
-[ext_resource type="Texture2D" uid="uid://b2xkixvkpguk6" path="res://attack_sword.png" id="1_ycbs3"]
+[ext_resource type="Texture2D" uid="uid://b2xkixvkpguk6" path="res://assets/attack_sword.png" id="1_ycbs3"]
 [ext_resource type="Script" uid="uid://c0llrm37icw4v" path="res://scripts/abilities/swordTest/sword_animation_controller.gd" id="2_n355p"]
 [ext_resource type="Script" uid="uid://p5v6oqb4uoi1" path="res://scripts/abilities/swordTest/sword.gd" id="2_s4ec8"]
 

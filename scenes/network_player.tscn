@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://v3d1ogl7dbfk"]
 
 [ext_resource type="Script" uid="uid://cxujnvfnqx5w3" path="res://scripts/player_characters/player_base.gd" id="1_5l5im"]
-[ext_resource type="Texture2D" uid="uid://cadmsq53mptb0" path="res://sheet.png" id="2_dtrl1"]
+[ext_resource type="Texture2D" uid="uid://cadmsq53mptb0" path="res://assets/sheet.png" id="2_dtrl1"]
 [ext_resource type="Script" uid="uid://bgtt12tk47epa" path="res://scripts/abilities/swordTest/sword_ability.gd" id="2_hc1dv"]
 [ext_resource type="Script" uid="uid://cx62di5gmvb48" path="res://scripts/player_characters/player_base_animation_controller.gd" id="3_dtrl1"]
 
