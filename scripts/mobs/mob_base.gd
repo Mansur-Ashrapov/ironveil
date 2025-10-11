@@ -115,6 +115,7 @@ func mob_movement():
 		if target_player == null:
 			velocity = Vector2.ZERO
 			stop_moving.emit()
+			return
 
 	# Вычисляем направление к игроку
 	var direction_to_target = (target_player.global_position - global_position).normalized()
