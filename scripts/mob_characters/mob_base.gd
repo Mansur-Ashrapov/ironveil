@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name MobBase
 
 const SPEED = 60
 const MAX_DISTANCE = 500
@@ -7,13 +8,28 @@ const TARGET_UPDATE_INTERVAL = 30
 # Радиус агрессии
 const AGRO_RADIUS = 300
 
-var target_player: Node2D
-var last_target_update = 0
+# Буфер состояний для интерполяции на клиентах
+var state_buffer := []
+var last_target_update := 0
+var target_player: Node2D = null
+
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
+# Параметры (можно расширять)
+@export var max_health := 50.0
+var health := max_health
+
 func _ready() -> void:
-	# Находим ближайщего игрока в сцене
-	find_nearest_player()
+	# добавляем в группу для поиска
+	add_to_group("mobs")
+		# сразу ищем цель (сервер выполнит реальную логику, клиент просто проинициализируется)
+	if multiplayer.is_server():
+		find_nearest_player()
+
+func _enter_tree() -> void:
+	# Назначаем владельцем (сервер - peer_id 1)
+	# У мобов обычно сервер - авторитет
+	set_multiplayer_authority(1)
 
 func find_nearest_player() -> bool:
 	# Ищем игрока по группе или по имени класса
