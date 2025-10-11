@@ -4,28 +4,34 @@ class_name PlayerBase
 const SPEED = 300.0
 const LERP_SPEED = 20.0
 
+@export var player_ui: Control
 @export var animation_controller: PlayerAnimationController
 @export var sprite: Sprite2D
 var player_camera: Camera2D
 
 # Ключ абилки, ключ для клавиши и ключ анимации должны совпадать, чтобы все работало
 @export var abilities: Array
-@export var max_health := 100.0
-@export var max_stamina := 100.0
-@export var max_mana := 100.0
+@export var max_health: int = 100
+@export var max_stamina: int = 100
+@export var max_mana: int = 100
+@export var base_damage: int = 10
+@export var expirience: int = 0
+@export var level: int = 0
 
+var expirience_to_level_up: int = 35
 var abilities_instances: Array
 
 var health := max_health
 var stamina := max_stamina
 var mana := max_mana
 
+
 var direction: Vector2 = Vector2(1, 0) # направление движения
 var last_direction: Vector2 = Vector2(1, 0) # нужен чтобы не отправлять Vector2.ZERO при отсутсвии инпута и наоборот, если инпут не меняется, сохранять прошлый
 var can_move: bool = true # когда персонаж использует абилку, не может двигаться
 
 # SIGNALS
-signal parametrs_changed(new_health: float, new_mana: float, new_stamina: float)
+signal parametrs_changed(new_health: int, new_mana: int, new_stamina: int, new_experience: int, new_lvl)
 signal get_hit()
 signal used_ability(ability_name: String)
 signal changed_direction(new_diretion: Vector2)
@@ -35,6 +41,9 @@ var state_buffer := [] # Буффер передвижений игрока
 
 
 func _ready() -> void:
+	# Добавляем игрока в группу для легкого поиска
+	add_to_group("players")
+	
 	get_hit.connect(animation_controller.on_get_hit)
 	used_ability.connect(animation_controller.on_ability_used)
 	changed_direction.connect(animation_controller.on_direction_changed)
@@ -48,6 +57,10 @@ func _enter_tree() -> void:
 	if is_multiplayer_authority():
 		player_camera = Camera2D.new()
 		self.add_child(player_camera)
+		
+		parametrs_changed.connect(player_ui.new_parametrs)
+	else:
+		player_ui.queue_free()
 
 	# на сервере получаем тикер и подключаем timeout, по которому обновляется состояние игроков
 	if multiplayer.is_server():
@@ -77,8 +90,8 @@ func _handle_move_input() -> void:
 	direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if last_direction == Vector2.ZERO and direction == Vector2.ZERO or last_direction == direction: return
 	elif not can_move: 
-			update_move_input.rpc_id(1, Vector2.ZERO)
-			last_direction = direction
+		update_move_input.rpc_id(1, Vector2.ZERO)
+		last_direction = direction
 	update_move_input.rpc_id(1, direction)
 	changed_direction.emit(direction)
 	last_direction = direction
@@ -90,7 +103,7 @@ func _handle_abilities_input() -> void:
 			if abilities_instances[idx].can_use(mana, stamina):
 				server_use_ability.rpc_id(1, idx)
 
-func take_damage(amount: float):
+func take_damage(amount: int):
 	health -= amount
 	get_hit.emit()
 
@@ -98,8 +111,17 @@ func take_damage(amount: float):
 		# TODO death
 		pass
 
-	sync_parametrs.rpc(health, mana, stamina)
+	sync_parametrs.rpc(health, mana, stamina, expirience, level)
 
+func get_expirience(amount: int):
+	expirience += amount
+	
+	while expirience >= expirience_to_level_up:
+		level += 1
+		expirience -= expirience_to_level_up
+
+	sync_parametrs.rpc(health, mana, stamina, expirience, level)
+	
 # Сервер обрабатывает использование абилки
 @rpc("any_peer", "reliable")
 func server_use_ability(ability_idx: int):
@@ -108,7 +130,7 @@ func server_use_ability(ability_idx: int):
 		abilities_instances[ability_idx].use(self)
 		mana -= (abilities_instances[ability_idx] as Ability).mana_cost
 		stamina -= (abilities_instances[ability_idx] as Ability).stamina_cost
-		sync_parametrs.rpc(health, mana, stamina)
+		sync_parametrs.rpc(health, mana, stamina, expirience, level)
 		sync_ability.rpc(ability_idx)
 		_stop_moving_while_use_ability(ability_idx)
 
@@ -141,11 +163,13 @@ func sync_ability(ability_idx: int):
 	_stop_moving_while_use_ability(ability_idx)
 
 @rpc("any_peer", "unreliable", "call_remote")
-func sync_parametrs(new_health: float, new_mana: float, new_stamina: float) -> void:
+func sync_parametrs(new_health: int, new_mana: int, new_stamina: int, new_expirience: int, new_lvl: int) -> void:
 	health = new_health
 	mana = new_mana
 	stamina = new_stamina
-	parametrs_changed.emit(new_health, new_mana, new_stamina)
+	expirience = new_expirience
+	level = new_lvl
+	parametrs_changed.emit(new_health, new_mana, new_stamina, new_expirience, new_lvl)
 
 # Вызывает rpc синхронизирующие состояние игрока
 func broadcast_state():
