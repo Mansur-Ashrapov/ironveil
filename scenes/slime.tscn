@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://btkww205aucrp"]
 
-[ext_resource type="Script" uid="uid://doqtsy35ujrb6" path="res://scripts/slime.gd" id="1_p2gj0"]
-[ext_resource type="Texture2D" uid="uid://bu1n2k16p3l40" path="res://slime_green.png" id="2_n6pvg"]
+[ext_resource type="Script" uid="uid://doqtsy35ujrb6" path="res://scripts/mob_characters/mob_base.gd" id="1_p2gj0"]
+[ext_resource type="Texture2D" uid="uid://bu1n2k16p3l40" path="res://assets/slime_green.png" id="2_n6pvg"]
 [ext_resource type="PackedScene" uid="uid://3mbvca1w8sh5" path="res://scenes/killzone.tscn" id="3_n6pvg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_n6pvg"]
