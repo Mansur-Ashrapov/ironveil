@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="ironveil"
-run/main_scene="uid://cj3ofmycfth6y"
+run/main_scene="uid://cwgldckefibmk"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-HighLevelMultiplayerHandler="*res://scripts/multiplayer/high_level_multiplayer_handler.gd"
+MultiplayerManager="*res://scripts/multiplayer/multiplayer_manager.gd"
+SteamManager="*res://scripts/multiplayer/steam/steam_manager.gd"
 
 [global_group]
 
@@ -57,3 +58,9 @@ ability0={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+
+[steam]
+
+initialization/app_id=0
+initialization/initialize_on_startup=false
+initialization/embed_callbacks=false

@@ -10,6 +10,7 @@ func _on_use(user: PlayerBase):
 	sword.flip_h = user.sprite.flip_h
 	if user.direction != Vector2.ZERO:
 		sword.global_position = user.global_position + user.direction * Vector2(50.0, 50.0)
+		sword.rotation = user.direction.angle() + 135 if sword.flip_h else user.direction.angle()
 	elif not sword.flip_h:
 		sword.global_position = user.global_position + Vector2.RIGHT * Vector2(50.0, 50.0)
 	else:
