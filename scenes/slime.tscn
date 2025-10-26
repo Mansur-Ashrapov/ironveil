@@ -113,6 +113,8 @@ script = ExtResource("3_pjw23")
 replication_config = SubResource("SceneReplicationConfig_n6pvg")
 
 [node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
 script = ExtResource("3_n6pvg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
