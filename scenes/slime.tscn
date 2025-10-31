@@ -1,7 +1,7 @@
 [gd_scene load_steps=13 format=3 uid="uid://cjubmbied2t6k"]
 
 [ext_resource type="Script" uid="uid://doqtsy35ujrb6" path="res://scripts/mobs/mob_base.gd" id="1_p2gj0"]
-[ext_resource type="Texture2D" uid="uid://bu1n2k16p3l40" path="res://slime_green.png" id="2_n6pvg"]
+[ext_resource type="Texture2D" uid="uid://bu1n2k16p3l40" path="res://assets/sprites/slime_green.png" id="2_pjw23"]
 [ext_resource type="Script" uid="uid://byyxc5e6bn44t" path="res://scripts/mobs/slime/killzone.gd" id="3_n6pvg"]
 [ext_resource type="Script" uid="uid://dxrooluvdresx" path="res://scripts/mobs/mob_base_animation_controller.gd" id="3_pjw23"]
 
@@ -99,7 +99,7 @@ script = ExtResource("1_p2gj0")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, 10.999999)
 scale = Vector2(5, 5)
-texture = ExtResource("2_n6pvg")
+texture = ExtResource("2_pjw23")
 hframes = 4
 vframes = 3
 
@@ -113,6 +113,8 @@ script = ExtResource("3_pjw23")
 replication_config = SubResource("SceneReplicationConfig_n6pvg")
 
 [node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
 script = ExtResource("3_n6pvg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]

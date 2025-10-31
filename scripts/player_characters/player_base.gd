@@ -76,9 +76,12 @@ func _process(delta: float) -> void:
 	if not multiplayer.is_server():
 		_interpolate_position()
 	elif multiplayer.is_server() and can_move: # Расчет положения игрока на сервере
-		global_position += direction * SPEED * delta
+		velocity = direction * SPEED
+		move_and_slide()
+		#global_position = global_position
+		#global_position += direction * SPEED * delta
 	_flip_sprite()
-	
+		
 func _flip_sprite():
 	if direction.x > 0:
 		sprite.flip_h = false
@@ -92,6 +95,8 @@ func _handle_move_input() -> void:
 	elif not can_move: 
 		update_move_input.rpc_id(1, Vector2.ZERO)
 		last_direction = direction
+		return
+		
 	update_move_input.rpc_id(1, direction)
 	changed_direction.emit(direction)
 	last_direction = direction

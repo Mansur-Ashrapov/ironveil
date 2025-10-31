@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b2xkixvkpguk6"
-path="res://.godot/imported/attack_sword.png-b87168dc180f45155a7e083fb2f6eb7a.ctex"
+uid="uid://dm371yaqn6wvj"
+path="res://.godot/imported/Water_coasts_animation.png-ae1d6d67219207641018b54bd902bd9c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/attack_sword.png"
-dest_files=["res://.godot/imported/attack_sword.png-b87168dc180f45155a7e083fb2f6eb7a.ctex"]
+source_file="res://assets/sprites/level_map/Water_coasts_animation.png"
+dest_files=["res://.godot/imported/Water_coasts_animation.png-ae1d6d67219207641018b54bd902bd9c.ctex"]
 
 [params]
 

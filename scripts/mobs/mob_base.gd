@@ -29,8 +29,7 @@ func _ready() -> void:
 	get_hit.connect(animation_cotroller.on_get_hit)
 	moving_to_player.connect(animation_cotroller.moving_to_player)
 	stop_moving.connect(animation_cotroller.stop_moving)
-
-
+	
 func find_nearest_player() -> bool:
 	# Ищем игрока по группе или по имени класса
 	var players = get_all_players()
