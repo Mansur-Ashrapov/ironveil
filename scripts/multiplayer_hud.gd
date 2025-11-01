@@ -51,6 +51,7 @@ func _show_waiting_players():
 	$CanvasLayer/waiting_for_players.show()
 
 func _hide_waiting_on_game_started():
+	$CanvasLayer/Label.hide()
 	$CanvasLayer/waiting_for_players.hide()
 
 func _on_lobby_match_list(lobbies: Array):

@@ -1,10 +1,10 @@
 extends CharacterBody2D
 class_name PlayerBase
 
-const SPEED = 300.0
+const SPEED = 240.0
 const LERP_SPEED = 20.0
 
-@export var player_ui: Control
+@export var player_ui: CanvasLayer
 @export var animation_controller: PlayerAnimationController
 @export var sprite: Sprite2D
 var player_camera: Camera2D
@@ -86,15 +86,17 @@ func _enter_tree() -> void:
 	else:
 		player_ui.queue_free()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not game_started:
 		return
 	# обработка нажатий игрока и отправка их серверу
 	if is_multiplayer_authority():
 		_handle_move_input()
 		_handle_abilities_input()
-		global_position += direction * SPEED * delta
+		velocity = direction * SPEED
 		_flip_sprite()
+	
+	move_and_slide()
 	
 func _flip_sprite():
 	if direction.x > 0:
@@ -123,8 +125,7 @@ func take_damage(amount: float):
 	get_hit.emit()
 
 	if health <= 0:
-		# TODO death
-		pass
+		print("spookie spokie skeleton")
 
 	sync_parametrs.rpc(health, mana, stamina, expirience, level)
 

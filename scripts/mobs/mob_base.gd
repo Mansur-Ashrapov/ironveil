@@ -7,7 +7,7 @@ class_name MobBase
 @onready var sprite: Sprite2D = $Sprite2D
 @export var game_started = false
 
-const SPEED = 60
+const SPEED = 90
 const MAX_DISTANCE = 800
 # Кадры между обновлением цели
 const TARGET_UPDATE_INTERVAL = 30

@@ -89,8 +89,8 @@ movie_quit_on_finish = true
 script = ExtResource("1_3s14c")
 
 [node name="Area2D" type="Area2D" parent="."]
-collision_layer = 2
-collision_mask = 2
+collision_layer = 6
+collision_mask = 6
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(0.5500003, 0.6)

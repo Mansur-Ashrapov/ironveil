@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cwgldckefibmk"]
+[gd_scene load_steps=7 format=3 uid="uid://cwgldckefibmk"]
 
 [ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
 [ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
 [ext_resource type="Script" uid="uid://ckq8iqqlp2qwm" path="res://scripts/multiplayer/networks/network_manager.gd" id="2_ofxfn"]
 [ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="3_ofxfn"]
+[ext_resource type="PackedScene" uid="uid://cj3ofmycfth6y" path="res://scenes/map.tscn" id="5_2dvlx"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cc156"]
 font_size = 29
@@ -19,17 +20,6 @@ unique_name_in_owner = true
 script = ExtResource("1_cw38t")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="HUD"]
-
-[node name="ScoreLabel" type="Label" parent="HUD/CanvasLayer"]
-offset_left = 513.0
-offset_top = -144.0
-offset_right = 618.0
-offset_bottom = -125.0
-theme_override_colors/font_color = Color(0.0980392, 0.313726, 0.752941, 1)
-theme_override_font_sizes/font_size = 8
-text = "You collected X coins."
-horizontal_alignment = 1
-autowrap_mode = 2
 
 [node name="MultiplayerHUD" type="Control" parent="HUD/CanvasLayer"]
 unique_name_in_owner = true
@@ -139,6 +129,17 @@ offset_right = 178.0
 offset_bottom = 56.0
 text = "RESTART"
 
+[node name="Label" type="Label" parent="HUD/CanvasLayer"]
+offset_left = 550.0
+offset_top = 97.0
+offset_right = 712.0
+offset_bottom = 224.0
+text = "WASD - move
+SPACE - sword attack
+RMB - FIREBALL
+
+MOUSE AIM NOT WORKING"
+
 [node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("players_spawn_node")]
 unique_name_in_owner = true
 script = ExtResource("2_ofxfn")
@@ -150,6 +151,7 @@ spawn_path = NodePath("../Players")
 spawn_limit = 10
 
 [node name="Players" type="Node2D" parent="."]
+position = Vector2(-993, -81)
 
 [node name="Slime" parent="." instance=ExtResource("3_ofxfn")]
 position = Vector2(837, 94)
@@ -157,7 +159,40 @@ position = Vector2(837, 94)
 [node name="Slime2" parent="." instance=ExtResource("3_ofxfn")]
 position = Vector2(826, 285)
 
+[node name="Slime3" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1540, 94)
+
+[node name="Slime4" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1529, 285)
+
+[node name="Slime5" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1444, 103)
+
+[node name="Slime6" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1433, 294)
+
+[node name="Slime7" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1361, -3)
+
+[node name="Slime8" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1350, 188)
+
+[node name="Slime9" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1269, 89)
+
+[node name="Slime10" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1258, 280)
+
+[node name="Slime11" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1205, 11)
+
+[node name="Slime12" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1194, 202)
+
 [node name="TRASH" type="Node2D" parent="." groups=["trash"]]
+
+[node name="map" parent="." instance=ExtResource("5_2dvlx")]
+position = Vector2(598, -50)
 
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="become_host"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="join_as_client"]

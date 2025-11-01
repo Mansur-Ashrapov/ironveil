@@ -1,7 +1,8 @@
-extends Area2D
+extends Node2D
 
 @export var hit_timer_cooldown: float =  1.5
 @export var damage: float = 15.0
+@export var damage_range: float = 80
 
 var players_to_hit: Array[PlayerBase]
 
@@ -14,14 +15,13 @@ func _ready() -> void:
 	add_child(hit_timer)
 	hit_timer.timeout.connect(_on_hit_timer)
 
+func get_all_players() -> Array:
+	return get_tree().get_nodes_in_group("players")
+
 func _on_hit_timer():
-	for player in players_to_hit:
-		player.take_damage(damage)
-
-func _on_body_entered(body: Node2D) -> void:
-	if multiplayer.is_server() and body is PlayerBase:
-		players_to_hit.append((body as PlayerBase))
-
-func _on_body_exited(body: Node2D) -> void:
-	if multiplayer.is_server() and body is PlayerBase:
-		players_to_hit = players_to_hit.filter(func(player: PlayerBase): return player.name != body.name)
+	if not multiplayer.is_server(): return
+	
+	for player in get_all_players():
+		print(player, global_position.distance_to(player.global_position))
+		if global_position.distance_to(player.global_position) <= damage_range:
+			player.take_damage(damage)

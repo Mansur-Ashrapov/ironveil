@@ -1,4 +1,4 @@
-extends Control
+extends CanvasLayer
 
 @export var hp: Label
 @export var st: Label
