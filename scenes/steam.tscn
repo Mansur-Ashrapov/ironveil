@@ -1,0 +1,167 @@
+[gd_scene load_steps=6 format=3 uid="uid://cwgldckefibmk"]
+
+[ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
+[ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
+[ext_resource type="Script" uid="uid://ckq8iqqlp2qwm" path="res://scripts/multiplayer/networks/network_manager.gd" id="2_ofxfn"]
+[ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="3_ofxfn"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_cc156"]
+font_size = 29
+
+[node name="steam" type="Node2D" groups=["root"]]
+
+[node name="GameManager" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_cc156")
+
+[node name="HUD" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_cw38t")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="HUD"]
+
+[node name="ScoreLabel" type="Label" parent="HUD/CanvasLayer"]
+offset_left = 513.0
+offset_top = -144.0
+offset_right = 618.0
+offset_bottom = -125.0
+theme_override_colors/font_color = Color(0.0980392, 0.313726, 0.752941, 1)
+theme_override_font_sizes/font_size = 8
+text = "You collected X coins."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="MultiplayerHUD" type="Control" parent="HUD/CanvasLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = 59.0
+offset_top = 70.0
+offset_right = 271.0
+offset_bottom = 231.0
+scale = Vector2(2.4482765, 2.6173155)
+
+[node name="Panel" type="Panel" parent="HUD/CanvasLayer/MultiplayerHUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -34.0
+offset_bottom = -93.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/MultiplayerHUD/Panel"]
+layout_mode = 0
+offset_right = 177.0
+offset_bottom = 68.0
+
+[node name="HostGame" type="Button" parent="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Host New Game"
+
+[node name="JoinAsClient" type="Button" parent="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Join as Client"
+
+[node name="UseSteam" type="Button" parent="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Use Steam"
+
+[node name="SteamHUD" type="Control" parent="HUD/CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 60.000004
+offset_top = 74.0
+offset_right = 180.0
+offset_bottom = 174.0
+scale = Vector2(3.6164927, 3.338871)
+
+[node name="Panel" type="Panel" parent="HUD/CanvasLayer/SteamHUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Options" type="VBoxContainer" parent="HUD/CanvasLayer/SteamHUD/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HostP2PGame" type="Button" parent="HUD/CanvasLayer/SteamHUD/Panel/Options"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Host P2P Game"
+
+[node name="ListLobbies" type="Button" parent="HUD/CanvasLayer/SteamHUD/Panel/Options"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "List Lobbies"
+
+[node name="Lobbies" type="ScrollContainer" parent="HUD/CanvasLayer/SteamHUD/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 44.02686
+offset_bottom = 4.0268555
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.9497084)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/SteamHUD/Panel/Lobbies"]
+layout_mode = 2
+
+[node name="waiting_for_players" type="Label" parent="HUD/CanvasLayer"]
+visible = false
+offset_left = 422.0
+offset_top = 190.0
+offset_right = 709.0
+offset_bottom = 230.0
+text = "Waiting for players..."
+label_settings = SubResource("LabelSettings_cc156")
+
+[node name="restart" type="Button" parent="HUD/CanvasLayer"]
+visible = false
+offset_right = 178.0
+offset_bottom = 56.0
+text = "RESTART"
+
+[node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("players_spawn_node")]
+unique_name_in_owner = true
+script = ExtResource("2_ofxfn")
+players_spawn_node = NodePath("../Players")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://v3d1ogl7dbfk")
+spawn_path = NodePath("../Players")
+spawn_limit = 10
+
+[node name="Players" type="Node2D" parent="."]
+
+[node name="Slime" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(837, 94)
+
+[node name="Slime2" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(826, 285)
+
+[node name="TRASH" type="Node2D" parent="." groups=["trash"]]
+
+[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="become_host"]
+[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="join_as_client"]
+[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/UseSteam" to="HUD" method="use_steam"]
+[connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/HostP2PGame" to="HUD" method="become_host"]
+[connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/ListLobbies" to="HUD" method="list_steam_lobbies"]
+[connection signal="pressed" from="HUD/CanvasLayer/restart" to="HUD" method="_on_restart_pressed"]

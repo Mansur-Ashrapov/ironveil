@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://dref11tiomsux"]
-
-[ext_resource type="Script" uid="uid://cvbss1jbm248d" path="res://scripts/multiplayer/server_sync.gd" id="1_h1iw2"]
-
-[node name="ServerSync" type="Node2D" groups=["server_sync"]]
-script = ExtResource("1_h1iw2")

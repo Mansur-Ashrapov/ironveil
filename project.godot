@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="ironveil"
-run/main_scene="uid://cj3ofmycfth6y"
+run/main_scene="uid://cwgldckefibmk"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://assets/sprites/icon.svg"
 
 [autoload]
 
-HighLevelMultiplayerHandler="*res://scripts/multiplayer/high_level_multiplayer_handler.gd"
+MultiplayerManager="*res://scripts/multiplayer/multiplayer_manager.gd"
+SteamManager="*res://scripts/multiplayer/steam/steam_manager.gd"
 
 [global_group]
 
@@ -25,6 +26,7 @@ players=""
 server_sync=""
 mob=""
 root=""
+trash=""
 
 [input]
 
@@ -53,7 +55,18 @@ ability0={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":32,"key_label":0,"unicode":32,"location":0,"echo":false,"script":null)
 ]
 }
+ability1={
+"deadzone": 0.2,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":2,"position":Vector2(266, 14),"global_position":Vector2(275, 62),"factor":1.0,"button_index":2,"canceled":false,"pressed":true,"double_click":false,"script":null)
+]
+}
 
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+
+[steam]
+
+initialization/app_id=0
+initialization/initialize_on_startup=false
+initialization/embed_callbacks=false

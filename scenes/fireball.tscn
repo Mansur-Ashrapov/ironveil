@@ -1,0 +1,101 @@
+[gd_scene load_steps=10 format=3 uid="uid://sroa8ntv1jk0"]
+
+[ext_resource type="Texture2D" uid="uid://dsqq2px3mpjg8" path="res://fireball.png" id="1_1gl40"]
+[ext_resource type="Script" uid="uid://bx2xvhljr7gic" path="res://scripts/abilities/fireball/fireball_animation_player.gd" id="1_3s14c"]
+[ext_resource type="Script" uid="uid://eab1xv48d5m2" path="res://scripts/abilities/fireball/fireball.gd" id="2_cb14k"]
+
+[sub_resource type="Animation" id="Animation_s4ec8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_cb14k"]
+resource_name = "explosion"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="Animation" id="Animation_3s14c"]
+resource_name = "mowing"
+length = 0.3
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [9, 8]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_k5whp"]
+_data = {
+&"RESET": SubResource("Animation_s4ec8"),
+&"explosion": SubResource("Animation_cb14k"),
+&"mowing": SubResource("Animation_3s14c")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1gl40"]
+size = Vector2(6.9, 6.8000007)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_cb14k"]
+properties/0/path = NodePath("AnimationPlayer:current_animation")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:can_move")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:target_path")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+
+[node name="fireball" type="Sprite2D"]
+position = Vector2(5.684342e-14, 1.0000001)
+scale = Vector2(5, 5)
+texture = ExtResource("1_1gl40")
+hframes = 4
+vframes = 3
+script = ExtResource("2_cb14k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_k5whp")
+}
+movie_quit_on_finish = true
+script = ExtResource("1_3s14c")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0.5500003, 0.6)
+scale = Vector2(0.9999998, 0.9999998)
+shape = SubResource("RectangleShape2D_1gl40")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_cb14k")

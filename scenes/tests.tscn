@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://ce2urcp5468xa"]
+
+[ext_resource type="PackedScene" uid="uid://sroa8ntv1jk0" path="res://scenes/fireball.tscn" id="1_tcuvc"]
+[ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="2_oumj0"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Slime" parent="." instance=ExtResource("2_oumj0")]
+position = Vector2(547, 130)
+
+[node name="fireball" parent="." instance=ExtResource("1_tcuvc")]
+position = Vector2(106, -7.0000005)
+scale = Vector2(10, 10)
+
+[node name="Slime2" parent="." instance=ExtResource("2_oumj0")]
+position = Vector2(549, 216)

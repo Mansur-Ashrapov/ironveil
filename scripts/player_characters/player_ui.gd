@@ -8,7 +8,7 @@ extends Control
 
 func new_parametrs(new_health: int, new_mana: int, new_stamina: int, new_experience: int, new_lvl: int):
 	hp.text = "HP: " + str(new_health)
-	st.text = "ST: " + str(new_mana)
-	mp.text = "MP: " + str(new_stamina)
+	st.text = "ST: " + str(new_stamina)
+	mp.text = "MP: " + str(new_mana)
 	ep.text = "EXP: " + str(new_experience)
 	lvl.text = "LVL: " + str(new_lvl)
