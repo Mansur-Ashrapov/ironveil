@@ -1,35 +1,37 @@
 extends CharacterBody2D
 class_name MobBase
 
-
-@export var expirience_cost: int = 30
-@export var health: int = 30
+@export var expirience_cost: int = 15
+@export var health: float = 30
 @onready var animation_cotroller: MobBaseAnimationController = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
+@export var game_started = false
 
 const SPEED = 60
-const MAX_DISTANCE = 500
+const MAX_DISTANCE = 800
 # Кадры между обновлением цели
 const TARGET_UPDATE_INTERVAL = 30
 # Радиус агрессии
 const AGRO_RADIUS = 300
+# Сила отбрасывания при получении урона
+const KNOCKBACK_FORCE = 200
+# Длительность отбрасывания в секундах
+const KNOCKBACK_DURATION = 0.2
 
 var target_player: Node2D
 var last_target_update = 0
+var is_knockback_active: bool = false
+var knockback_velocity: Vector2 = Vector2.ZERO
+var knockback_timer: float = 0.0
 
 signal get_hit()
 signal moving_to_player()
 signal stop_moving()
 
 func _ready() -> void:
-	# Находим ближайщего игрока в сцене
-	if multiplayer.is_server():
-		find_nearest_player()
-	
 	get_hit.connect(animation_cotroller.on_get_hit)
 	moving_to_player.connect(animation_cotroller.moving_to_player)
 	stop_moving.connect(animation_cotroller.stop_moving)
-
 
 func find_nearest_player() -> bool:
 	# Ищем игрока по группе или по имени класса
@@ -55,17 +57,29 @@ func find_nearest_player() -> bool:
 	target_player = nearest_player
 	return target_player != null
 
-
-func get_damage(amount: int):
+func get_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
 	health -= amount
-	if health <= 0:
+	
+	get_hit.emit()
+	
+	# Применяем импульс/отбрасывание
+	if damage_source_position != Vector2.ZERO:
+		apply_knockback(damage_source_position)
+	
+	if health <= 0 and multiplayer.is_server():
 		for player in get_all_players():
 			if player is PlayerBase:
 				player.get_expirience(expirience_cost)
-		
+		await get_tree().create_timer(0.25).timeout
 		death.rpc()
 		
-	get_hit.emit()
+
+func apply_knockback(damage_source_position: Vector2):
+	# Вычисляем направление от источника урона
+	var knockback_direction = (global_position - damage_source_position).normalized()
+	knockback_velocity = knockback_direction * KNOCKBACK_FORCE
+	is_knockback_active = true
+	knockback_timer = KNOCKBACK_DURATION
 
 @rpc("any_peer", "call_local", "reliable")
 func death():
@@ -85,12 +99,30 @@ func get_all_players() -> Array:
 	
 	return players
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	if not game_started:
+		return
+	
 	if multiplayer.is_server():
-		mob_movement()
+		mob_movement(delta)
 
-func mob_movement():
-	# Обновляем цель с итервалом
+func mob_movement(delta: float):
+	# Обрабатываем отбрасывание
+	if is_knockback_active:
+		knockback_timer -= delta
+		velocity = knockback_velocity
+		
+		# Затухание отбрасывания (опционально)
+		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, 1.0 - (knockback_timer / KNOCKBACK_DURATION))
+		
+		if knockback_timer <= 0:
+			is_knockback_active = false
+			knockback_velocity = Vector2.ZERO
+		
+		move_and_slide()
+		return
+	
+	# Обновляем цель с интервалом
 	last_target_update += 1
 	if last_target_update >= TARGET_UPDATE_INTERVAL:
 		find_nearest_player()

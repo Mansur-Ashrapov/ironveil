@@ -6,7 +6,7 @@ var steam_id: int = 0
 var steam_username: String = ""
 
 var lobby_id = 0
-var lobby_max_members = 10
+var lobby_max_members = 2
 
 func _init():
 	print("Init Steam")

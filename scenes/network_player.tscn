@@ -1,9 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://v3d1ogl7dbfk"]
+[gd_scene load_steps=16 format=3 uid="uid://v3d1ogl7dbfk"]
 
 [ext_resource type="Script" uid="uid://cxujnvfnqx5w3" path="res://scripts/player_characters/player_base.gd" id="1_5l5im"]
 [ext_resource type="Texture2D" uid="uid://cadmsq53mptb0" path="res://sheet.png" id="2_dtrl1"]
-[ext_resource type="Script" uid="uid://bgtt12tk47epa" path="res://scripts/abilities/swordTest/sword_ability.gd" id="2_hc1dv"]
+[ext_resource type="Script" uid="uid://bgtt12tk47epa" path="res://scripts/abilities/fireball/fireball_ability.gd" id="2_hc1dv"]
 [ext_resource type="Script" uid="uid://cx62di5gmvb48" path="res://scripts/player_characters/player_base_animation_controller.gd" id="3_dtrl1"]
+[ext_resource type="Script" uid="uid://2f8xfkr07dyn" path="res://scripts/abilities/swordTest/sword_ability.gd" id="3_hquwp"]
 [ext_resource type="PackedScene" uid="uid://buyios2xjnnn4" path="res://scenes/player_ui.tscn" id="3_rhx3x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_27uls"]
@@ -114,6 +115,9 @@ properties/2/replication_mode = 1
 properties/3/path = NodePath("Char-sheet:flip_h")
 properties/3/spawn = true
 properties/3/replication_mode = 1
+properties/4/path = NodePath(".:game_started")
+properties/4/spawn = true
+properties/4/replication_mode = 1
 
 [node name="NetworkPlayer" type="CharacterBody2D" node_paths=PackedStringArray("player_ui", "animation_controller", "sprite") groups=["players"]]
 motion_mode = 1
@@ -121,7 +125,7 @@ script = ExtResource("1_5l5im")
 player_ui = NodePath("Control")
 animation_controller = NodePath("AnimationPlayer")
 sprite = NodePath("Char-sheet")
-abilities = [ExtResource("2_hc1dv")]
+abilities = [ExtResource("3_hquwp"), ExtResource("2_hc1dv")]
 
 [node name="Control" parent="." instance=ExtResource("3_rhx3x")]
 offset_left = -576.0

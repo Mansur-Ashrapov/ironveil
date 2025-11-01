@@ -1,24 +1,26 @@
 extends Node
 
 var multiplayer_scene = preload("res://scenes/network_player.tscn")
-var multiplayer_peer: SteamMultiplayerPeer = SteamMultiplayerPeer.new()
+var multiplayer_peer: SteamMultiplayerPeer
 var _players_spawn_node
 var _hosted_lobby_id = 0
 
 const LOBBY_NAME = "IRONVEIL"
 const LOBBY_MODE = "CoOP"
 
+signal player_created()
+
 func  _ready():
 	Steam.lobby_created.connect(_on_lobby_created.bind())
 
-func become_host():
+func become_host(max_players: int):
 	print("Starting host!")
 	
 	multiplayer.peer_connected.connect(_add_player_to_game)
 	multiplayer.peer_disconnected.connect(_del_player)
 	
 	Steam.lobby_joined.connect(_on_lobby_joined.bind())
-	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, SteamManager.lobby_max_members)
+	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 	
 func join_as_client(lobby_id):
 	print("Joining lobby %s" % lobby_id)
@@ -40,7 +42,7 @@ func _on_lobby_created(_connect: int, lobby_id):
 
 func _create_host():
 	print("Create Host")
-	
+	multiplayer_peer = SteamMultiplayerPeer.new()
 	var error = multiplayer_peer.create_host(0)
 	
 	if error == OK:
@@ -76,6 +78,7 @@ func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: in
 		print(FAIL_REASON)
 	
 func connect_socket(steam_id: int):
+	multiplayer_peer = SteamMultiplayerPeer.new()
 	var error = multiplayer_peer.create_client(steam_id, 0)
 	if error == OK:
 		print("Connecting peer to host...")
@@ -97,24 +100,10 @@ func _add_player_to_game(id: int):
 	player_to_add.name = str(id)
 	
 	_players_spawn_node.add_child(player_to_add, true)
+	player_created.emit()
 	
 func _del_player(id: int):
 	print("Player %s left the game!" % id)
 	if not _players_spawn_node.has_node(str(id)):
 		return
 	_players_spawn_node.get_node(str(id)).queue_free()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	

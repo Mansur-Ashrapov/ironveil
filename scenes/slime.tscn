@@ -83,6 +83,12 @@ properties/0/replication_mode = 1
 properties/1/path = NodePath("AnimationPlayer:current_animation")
 properties/1/spawn = true
 properties/1/replication_mode = 1
+properties/2/path = NodePath("Sprite2D:flip_h")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:game_started")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pjw23"]
 size = Vector2(116, 125)
@@ -119,8 +125,9 @@ script = ExtResource("3_n6pvg")
 position = Vector2(1, 24.5)
 shape = SubResource("RectangleShape2D_pjw23")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["mob"]]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0.5, 26)
 shape = SubResource("RectangleShape2D_n6pvg")
 
 [connection signal="body_entered" from="Area2D" to="Area2D" method="_on_body_entered"]
+[connection signal="body_exited" from="Area2D" to="Area2D" method="_on_body_exited"]

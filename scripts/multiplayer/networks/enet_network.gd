@@ -4,13 +4,16 @@ const SERVER_PORT = 8080
 const SERVER_IP = "127.0.0.1"
 
 var multiplayer_scene = preload("res://scenes/network_player.tscn")
-var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
+var multiplayer_peer: ENetMultiplayerPeer
 var _players_spawn_node
 
-func become_host():
+signal player_created()
+
+func become_host(max_players: int):
 	print("Starting host!")
-	
-	multiplayer_peer.create_server(SERVER_PORT)
+
+	multiplayer_peer = ENetMultiplayerPeer.new()
+	multiplayer_peer.create_server(SERVER_PORT, max_players)
 	multiplayer.multiplayer_peer = multiplayer_peer
 	
 	multiplayer.peer_connected.connect(_add_player_to_game)
@@ -21,7 +24,8 @@ func become_host():
 	
 func join_as_client(_lobby_id):
 	print("Player 2 joining")
-	
+
+	multiplayer_peer = ENetMultiplayerPeer.new()
 	multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
 
@@ -32,18 +36,10 @@ func _add_player_to_game(id: int):
 	player_to_add.name = str(id)
 	
 	_players_spawn_node.add_child(player_to_add, true)
-	
+	player_created.emit()
+
 func _del_player(id: int):
 	print("Player %s left the game!" % id)
 	if not _players_spawn_node.has_node(str(id)):
 		return
 	_players_spawn_node.get_node(str(id)).queue_free()
-
-	
-	
-	
-	
-	
-	
-	
-	

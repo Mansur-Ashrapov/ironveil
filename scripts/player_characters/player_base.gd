@@ -11,13 +11,18 @@ var player_camera: Camera2D
 
 # Ключ абилки, ключ для клавиши и ключ анимации должны совпадать, чтобы все работало
 @export var abilities: Array
-@export var max_health: int = 100
-@export var max_stamina: int = 100
-@export var max_mana: int = 100
-@export var base_damage: int = 10
-@export var expirience: int = 0
+@export var max_health: float = 100.0
+@export var max_stamina: float = 100.0
+@export var max_mana: float = 100.0
+@export var base_damage: float = 10.0
+@export var expirience: float = 0
 @export var level: int = 0
 @export var direction: Vector2 = Vector2(1, 0) # направление движения
+@export var game_started: bool = false
+
+@export var health_regen: float = 0.25
+@export var mana_regen: float = 0.75
+@export var stamina_regen: float = 1.5
 
 var expirience_to_level_up: int = 35
 var abilities_instances: Array
@@ -49,6 +54,25 @@ func _ready() -> void:
 	
 	for ability in abilities:
 		abilities_instances.append(ability.new())
+	
+	var regen_timer = Timer.new()
+	regen_timer.wait_time = 1.0
+	regen_timer.autostart = true
+	regen_timer.one_shot = false
+	add_child(regen_timer)
+	regen_timer.timeout.connect(_on_regen_tick)
+
+func _on_regen_tick() -> void:
+	if not game_started and not multiplayer.is_server():
+		return
+
+	# Применяем восстановление
+	health = clamp(health + health_regen, 0, max_health)
+	mana = clamp(mana + mana_regen, 0, max_mana)
+	stamina = clamp(stamina + stamina_regen, 0, max_stamina)
+
+	# Обновляем параметры на всех клиентах
+	sync_parametrs.rpc(health, mana, stamina, expirience, level)
 
 func _enter_tree() -> void:
 	# назначаем игрока владельцем
@@ -58,10 +82,13 @@ func _enter_tree() -> void:
 		player_camera = Camera2D.new()
 		self.add_child(player_camera)
 		parametrs_changed.connect(player_ui.new_parametrs)
+		sync_parametrs.rpc(health, mana, stamina, expirience, level)
 	else:
 		player_ui.queue_free()
 
 func _process(delta: float) -> void:
+	if not game_started:
+		return
 	# обработка нажатий игрока и отправка их серверу
 	if is_multiplayer_authority():
 		_handle_move_input()
@@ -91,7 +118,7 @@ func _handle_abilities_input() -> void:
 			if abilities_instances[idx].can_use(mana, stamina):
 				server_use_ability.rpc_id(1, idx)
 
-func take_damage(amount: int):
+func take_damage(amount: float):
 	health -= amount
 	get_hit.emit()
 
@@ -109,7 +136,14 @@ func get_expirience(amount: int):
 		expirience -= expirience_to_level_up
 
 	sync_parametrs.rpc(health, mana, stamina, expirience, level)
-	
+
+func start_game():
+	_start_game.rpc()
+
+@rpc("any_peer", "reliable", "call_local")
+func _start_game():
+	game_started = true
+
 # Сервер обрабатывает использование абилки
 @rpc("any_peer", "reliable", "call_local")
 func server_use_ability(ability_idx: int):
@@ -124,11 +158,12 @@ func server_use_ability(ability_idx: int):
 # Ключ абилки, ключ для клавиши и ключ анимации должны совпадать, чтобы все работало
 @rpc("any_peer", "reliable", "call_local")
 func sync_ability(ability_idx: int):
+	if multiplayer.is_server(): return
 	used_ability.emit("ability" + str(ability_idx))
 	abilities_instances[ability_idx].use(self)
 
 @rpc("any_peer", "unreliable", "call_local")
-func sync_parametrs(new_health: int, new_mana: int, new_stamina: int, new_expirience: int, new_lvl: int) -> void:
+func sync_parametrs(new_health: float, new_mana: float, new_stamina: float, new_expirience: float, new_lvl: int) -> void:
 	health = new_health
 	mana = new_mana
 	stamina = new_stamina
