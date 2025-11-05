@@ -17,6 +17,7 @@ config/icon="res://assets/sprites/icon.svg"
 
 [autoload]
 
+HighLevelMultiplayerHandler="*res://scripts/multiplayer/high_level_multiplayer_handler.gd"
 MultiplayerManager="*res://scripts/multiplayer/multiplayer_manager.gd"
 SteamManager="*res://scripts/multiplayer/steam/steam_manager.gd"
 
