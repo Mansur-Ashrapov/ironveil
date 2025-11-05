@@ -74,6 +74,7 @@ properties/2/spawn = true
 properties/2/replication_mode = 1
 
 [node name="fireball" type="Sprite2D"]
+z_index = 3
 position = Vector2(5.684342e-14, 1.0000001)
 scale = Vector2(5, 5)
 texture = ExtResource("1_1gl40")

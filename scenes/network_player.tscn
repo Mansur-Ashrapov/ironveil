@@ -120,7 +120,7 @@ properties/4/spawn = true
 properties/4/replication_mode = 1
 
 [node name="NetworkPlayer" type="CharacterBody2D" node_paths=PackedStringArray("player_ui", "animation_controller", "sprite") groups=["players"]]
-z_index = 2
+z_index = 3
 y_sort_enabled = true
 collision_mask = 2
 motion_mode = 1

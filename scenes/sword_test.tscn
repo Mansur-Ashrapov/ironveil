@@ -45,6 +45,7 @@ _data = {
 size = Vector2(9.200001, 8.6)
 
 [node name="sword" type="Sprite2D"]
+z_index = 3
 scale = Vector2(10, 10)
 texture = ExtResource("1_ycbs3")
 hframes = 3
