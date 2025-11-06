@@ -189,6 +189,96 @@ position = Vector2(1205, 11)
 [node name="Slime12" parent="." instance=ExtResource("3_ofxfn")]
 position = Vector2(1194, 202)
 
+[node name="Slime13" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2599, 295)
+
+[node name="Slime14" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2588, 486)
+
+[node name="Slime15" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2503, 304)
+
+[node name="Slime16" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2492, 495)
+
+[node name="Slime17" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2420, 198)
+
+[node name="Slime18" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2409, 389)
+
+[node name="Slime19" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2328, 290)
+
+[node name="Slime20" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2317, 481)
+
+[node name="Slime21" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2264, 212)
+
+[node name="Slime22" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2253, 403)
+
+[node name="Slime23" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2059, 878)
+
+[node name="Slime24" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(2048, 1069)
+
+[node name="Slime25" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1963, 887)
+
+[node name="Slime26" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1952, 1078)
+
+[node name="Slime27" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1880, 781)
+
+[node name="Slime28" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1869, 972)
+
+[node name="Slime29" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1788, 873)
+
+[node name="Slime30" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1777, 1064)
+
+[node name="Slime31" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1724, 795)
+
+[node name="Slime32" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1713, 986)
+
+[node name="Slime33" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1880, -716)
+
+[node name="Slime34" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1869, -525)
+
+[node name="Slime35" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1784, -707)
+
+[node name="Slime36" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1773, -516)
+
+[node name="Slime37" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1701, -813)
+
+[node name="Slime38" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1690, -622)
+
+[node name="Slime39" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1609, -721)
+
+[node name="Slime40" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1598, -530)
+
+[node name="Slime41" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1545, -799)
+
+[node name="Slime42" parent="." instance=ExtResource("3_ofxfn")]
+position = Vector2(1534, -608)
+
 [node name="TRASH" type="Node2D" parent="." groups=["trash"]]
 
 [node name="map" parent="." instance=ExtResource("5_2dvlx")]

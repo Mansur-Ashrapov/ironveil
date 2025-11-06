@@ -21,7 +21,7 @@ var player_camera: Camera2D
 @export var game_started: bool = false
 
 @export var health_regen: float = 0.25
-@export var mana_regen: float = 0.75
+@export var mana_regen: float = 2
 @export var stamina_regen: float = 1.5
 
 var expirience_to_level_up: int = 35
