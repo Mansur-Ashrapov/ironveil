@@ -1,10 +1,10 @@
 [gd_scene load_steps=7 format=3 uid="uid://cwgldckefibmk"]
 
-[ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
-[ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
+[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_cc156"]
+[ext_resource type="Script" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
 [ext_resource type="Script" uid="uid://ckq8iqqlp2qwm" path="res://scripts/multiplayer/networks/network_manager.gd" id="2_ofxfn"]
 [ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="3_ofxfn"]
-[ext_resource type="PackedScene" uid="uid://cj3ofmycfth6y" path="res://scenes/map.tscn" id="5_2dvlx"]
+[ext_resource type="PackedScene" uid="uid://b4wlhb7ae0w0v" path="res://scenes/map.tscn" id="5_2dvlx"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_cc156"]
 font_size = 29
