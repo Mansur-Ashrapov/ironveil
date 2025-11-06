@@ -14,7 +14,15 @@ func get_all_mobs() -> Array[MobBase]:
 	mobs.append_array(get_tree().get_nodes_in_group("mob"))
 	return mobs
 
-func start_game():
+func start_game(solo: bool = false):
+	if solo:
+		for player in get_all_players():
+			print(player.name)
+			player.start_game()
+		for mob in get_all_mobs():
+			mob.game_started = true
+		return
+		
 	if len(get_all_players()) < %NetworkManager.max_players:
 		return
 

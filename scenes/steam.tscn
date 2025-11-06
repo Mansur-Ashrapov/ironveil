@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://cwgldckefibmk"]
 
-[ext_resource type="Script" path="res://scripts/game_manager.gd" id="1_cc156"]
-[ext_resource type="Script" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
+[ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
+[ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
 [ext_resource type="Script" uid="uid://ckq8iqqlp2qwm" path="res://scripts/multiplayer/networks/network_manager.gd" id="2_ofxfn"]
 [ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="3_ofxfn"]
 [ext_resource type="PackedScene" uid="uid://b4wlhb7ae0w0v" path="res://scenes/map.tscn" id="5_2dvlx"]
@@ -36,8 +36,8 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -34.0
-offset_bottom = -93.0
+offset_right = -33.915543
+offset_bottom = -68.53885
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -60,6 +60,12 @@ text = "Join as Client"
 layout_mode = 2
 theme_override_font_sizes/font_size = 8
 text = "Use Steam"
+
+[node name="TEST SOLO" type="Button" parent="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "TEST SOLO
+"
 
 [node name="SteamHUD" type="Control" parent="HUD/CanvasLayer"]
 unique_name_in_owner = true
@@ -154,10 +160,10 @@ spawn_limit = 10
 position = Vector2(-993, -81)
 
 [node name="Slime" parent="." instance=ExtResource("3_ofxfn")]
-position = Vector2(837, 94)
+position = Vector2(763, 163)
 
 [node name="Slime2" parent="." instance=ExtResource("3_ofxfn")]
-position = Vector2(826, 285)
+position = Vector2(754, 297)
 
 [node name="Slime3" parent="." instance=ExtResource("3_ofxfn")]
 position = Vector2(1540, 94)
@@ -287,6 +293,7 @@ position = Vector2(598, -50)
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="become_host"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="join_as_client"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/UseSteam" to="HUD" method="use_steam"]
+[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/TEST SOLO" to="HUD" method="play_solo"]
 [connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/HostP2PGame" to="HUD" method="become_host"]
 [connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/ListLobbies" to="HUD" method="list_steam_lobbies"]
 [connection signal="pressed" from="HUD/CanvasLayer/restart" to="HUD" method="_on_restart_pressed"]

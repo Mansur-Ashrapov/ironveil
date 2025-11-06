@@ -27,6 +27,18 @@ func join_as_client():
 	_show_waiting_players()
 	_show_restart_button("DISCONNECT")
 
+
+func play_solo():
+	print("play_solo pressed")
+	%MultiplayerHUD.hide()
+	%SteamHUD.hide()
+	%NetworkManager.become_host()
+	%GameManager.start_game(true)
+	#_show_waiting_players()
+	$CanvasLayer/Label.hide()
+	_show_restart_button("MENU")
+
+
 func use_steam():
 	print("Using Steam!")
 	%MultiplayerHUD.hide()
