@@ -24,6 +24,11 @@ var player_camera: Camera2D
 @export var mana_regen: float = 2
 @export var stamina_regen: float = 1.5
 
+@export var health_per_level: float = 20.0
+@export var stamina_per_level: float = 20.0
+@export var mana_per_level: float = 20.0
+@export var damage_per_level: float = 5.0
+
 var expirience_to_level_up: int = 35
 var abilities_instances: Array
 
@@ -97,7 +102,7 @@ func _process(_delta: float) -> void:
 		_flip_sprite()
 	
 	move_and_slide()
-	
+
 func _flip_sprite():
 	if direction.x > 0:
 		sprite.flip_h = false
@@ -135,11 +140,26 @@ func get_expirience(amount: int):
 	while expirience >= expirience_to_level_up:
 		level += 1
 		expirience -= expirience_to_level_up
+		level_up()
 
+	sync_maxs_parametrs.rpc(max_health, max_stamina, max_mana, base_damage)
 	sync_parametrs.rpc(health, mana, stamina, expirience, level)
+
+func level_up():
+	max_stamina += stamina_per_level
+	max_mana += mana_per_level
+	max_health += health_per_level
+	base_damage += damage_per_level
 
 func start_game():
 	_start_game.rpc()
+
+@rpc("any_peer", "reliable", "call_local")
+func sync_maxs_parametrs(max_h, max_s, max_m, base_d):
+	max_health = max_h
+	max_stamina = max_s
+	max_mana = max_m
+	base_damage = base_d
 
 @rpc("any_peer", "reliable", "call_local")
 func _start_game():
