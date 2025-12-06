@@ -43,6 +43,12 @@ var pending_upgrades: int = 0
 var last_direction: Vector2 = Vector2(1, 0) # нужен чтобы не отправлять Vector2.ZERO при отсутсвии инпута и наоборот, если инпут не меняется, сохранять прошлый
 var can_move: bool = true # когда персонаж использует абилку, не может двигаться
 
+# RESPAWN SYSTEM
+var spawn_position: Vector2 = Vector2.ZERO
+var is_dead: bool = false
+var respawn_timer: Timer
+const RESPAWN_TIME: float = 5.0
+
 # SIGNALS
 signal parameters_changed(new_health: int, new_mana: int, new_stamina: int, new_experience: int, new_lvl)
 signal get_hit()
@@ -50,6 +56,9 @@ signal used_ability(ability_name: String)
 signal changed_direction(new_diretion: Vector2)
 signal show_ability_upgrade_ui(abilities: Array)  # Показать UI выбора навыка для прокачки
 signal ability_upgraded(ability_idx: int, new_level: int)  # Навык улучшен
+signal respawn_timer_started()  # Таймер респавна начался
+signal respawn_timer_updated(time_remaining: float)  # Обновление таймера респавна
+signal respawn_timer_finished()  # Таймер респавна завершен
 
 # POSITION INTERPOLATION
 var state_buffer := [] # Буффер передвижений игрока
@@ -72,12 +81,24 @@ func _ready() -> void:
 	regen_timer.one_shot = false
 	add_child(regen_timer)
 	regen_timer.timeout.connect(_on_regen_tick)
+	
+	# Создаем таймер респавна
+	respawn_timer = Timer.new()
+	respawn_timer.wait_time = 0.1  # Обновляем каждые 0.1 секунды для плавного отображения
+	respawn_timer.autostart = false
+	respawn_timer.one_shot = false
+	add_child(respawn_timer)
+	respawn_timer.timeout.connect(_on_respawn_timer_tick)
 
 func _on_regen_tick() -> void:
 	if not game_started:
 		return
 	
 	if not multiplayer.is_server():
+		return
+	
+	# Не восстанавливаем ресурсы если игрок мертв
+	if is_dead:
 		return
 
 	# Применяем восстановление
@@ -91,6 +112,9 @@ func _on_regen_tick() -> void:
 func _enter_tree() -> void:
 	# назначаем игрока владельцем
 	set_multiplayer_authority(name.to_int())
+	
+	# Сохраняем начальную позицию спавна
+	spawn_position = global_position
 
 	if is_multiplayer_authority():
 		player_camera = Camera2D.new()
@@ -104,6 +128,12 @@ func _enter_tree() -> void:
 
 func _process(_delta: float) -> void:
 	if not game_started:
+		return
+	# Если игрок мертв, не обрабатываем ввод (на всех клиентах)
+	if is_dead:
+		velocity = Vector2.ZERO
+		direction = Vector2.ZERO
+		move_and_slide()
 		return
 	# обработка нажатий игрока и отправка их серверу
 	if is_multiplayer_authority():
@@ -151,12 +181,17 @@ func _handle_move_input() -> void:
 
 # Обрабатывает использование абилок
 func _handle_abilities_input() -> void:
+	if is_dead:
+		return  # Нельзя использовать способности когда мертв
 	for idx in range(0, abilities_instances.size()):
 		if Input.is_action_just_pressed("ability" + str(idx)):
 			if abilities_instances[idx].can_use(mana, stamina):
 				server_use_ability.rpc_id(1, idx)
 
 func take_damage(amount: float):
+	if is_dead:
+		return  # Игрок уже мертв, не обрабатываем урон
+	
 	health -= amount
 	get_hit.emit()
 	
@@ -164,10 +199,8 @@ func take_damage(amount: float):
 	_sync_sound.rpc("player_hurt")
 
 	if health <= 0:
-		print("spookie spokie skeleton")
-		# Звук смерти только для владельца
-		if is_multiplayer_authority():
-			SoundManager.play_sound("player_death", global_position)
+		health = 0
+		_on_death()
 
 	sync_parameters.rpc(health, mana, stamina, experience, level)
 
@@ -291,3 +324,118 @@ func sync_parameters(new_health: float, new_mana: float, new_stamina: float, new
 @rpc("any_peer", "reliable", "call_local")
 func _sync_sound(sound_key: String) -> void:
 	SoundManager.play_sound(sound_key, global_position)
+
+# Обработка смерти игрока
+func _on_death():
+	if is_dead:
+		return  # Уже обрабатываем смерть
+	
+	print("spookie spokie skeleton")
+	
+	# Синхронизируем состояние смерти на всех клиентах и запускаем таймер
+	if multiplayer.is_server():
+		# На сервере устанавливаем состояние и запускаем таймер
+		set_dead_state.rpc(true)
+		start_respawn_timer.rpc()
+	else:
+		# На клиенте просто устанавливаем состояние (таймер запустится через RPC)
+		set_dead_state.rpc(true)
+	
+	# Звук смерти только для владельца
+	if is_multiplayer_authority():
+		SoundManager.play_sound("player_death", global_position)
+
+# Синхронизация состояния смерти
+@rpc("any_peer", "reliable", "call_local")
+func set_dead_state(dead: bool):
+	is_dead = dead
+	if dead:
+		# Скрываем спрайт игрока
+		if sprite:
+			sprite.visible = false
+		# Блокируем движение немедленно
+		velocity = Vector2.ZERO
+		direction = Vector2.ZERO
+	else:
+		# Показываем спрайт игрока
+		if sprite:
+			sprite.visible = true
+
+# Запуск таймера респавна
+@rpc("any_peer", "reliable", "call_local")
+func start_respawn_timer():
+	if not respawn_timer:
+		return
+	
+	# Убеждаемся, что is_dead установлен (на случай если RPC пришел раньше)
+	if not is_dead:
+		is_dead = true
+	
+	# Сбрасываем таймер
+	respawn_time_remaining = RESPAWN_TIME
+	
+	# Показываем таймер только владельцу игрока
+	if is_multiplayer_authority():
+		respawn_timer_started.emit()
+	
+	# Останавливаем таймер если он уже запущен
+	if respawn_timer.is_stopped() == false:
+		respawn_timer.stop()
+	
+	respawn_timer.start()
+	_on_respawn_timer_tick()  # Сразу обновляем таймер
+
+# Обновление таймера респавна
+var respawn_time_remaining: float = RESPAWN_TIME
+
+func _on_respawn_timer_tick():
+	# Если таймер запущен, он должен работать до истечения времени
+	# (независимо от is_dead, так как RPC могут прийти в разном порядке)
+	
+	respawn_time_remaining -= respawn_timer.wait_time
+	
+	# Обновляем UI только для владельца (если is_dead установлен)
+	if is_multiplayer_authority() and is_dead:
+		respawn_timer_updated.emit(respawn_time_remaining)
+	
+	# Когда таймер истек, респавним игрока (только на сервере)
+	if respawn_time_remaining <= 0:
+		respawn_timer.stop()
+		respawn_time_remaining = RESPAWN_TIME
+		
+		if multiplayer.is_server():
+			# Убеждаемся, что is_dead установлен перед респавном
+			if not is_dead:
+				is_dead = true
+			respawn_player.rpc()
+
+# Респавн игрока
+@rpc("any_peer", "reliable", "call_local")
+func respawn_player():
+	# Синхронизируем состояние смерти на всех клиентах
+	set_dead_state.rpc(false)
+	
+	# Восстанавливаем здоровье, ману и выносливость (только на сервере)
+	if multiplayer.is_server():
+		health = max_health
+		mana = max_mana
+		stamina = max_stamina
+		
+		# Перемещаем игрока на начальную точку спавна
+		global_position = spawn_position
+		
+		# Синхронизируем позицию на всех клиентах
+		sync_respawn_position.rpc(spawn_position)
+		
+		# Синхронизируем параметры
+		sync_parameters.rpc(health, mana, stamina, experience, level)
+	
+	# Скрываем таймер для владельца (на всех клиентах)
+	if is_multiplayer_authority():
+		respawn_timer_finished.emit()
+
+# Синхронизация позиции респавна
+@rpc("any_peer", "reliable", "call_local")
+func sync_respawn_position(new_position: Vector2):
+	global_position = new_position
+

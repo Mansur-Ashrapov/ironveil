@@ -11,25 +11,25 @@ class_name SoundManagerClass
 # Словарь звуков: ключ -> путь к аудиофайлу
 var sounds: Dictionary = {
 	# Звуки игрока
-	"player_hurt": "",          # Игрок получает урон
-	"player_death": "",         # Смерть игрока
-	"player_level_up": "",      # Повышение уровня
+	"player_hurt": "res://sounds/player_hurt.wav",          # Игрок получает урон
+	"player_death": "res://sounds/player_death.wav",         # Смерть игрока
+	"player_level_up": "res://sounds/player_level_up.wav",      # Повышение уровня
 	"player_footstep": "",      # Шаги
 	
 	# Звуки способностей
 	"ability_sword": "",        # Удар мечом
-	"ability_beam": "",         # Луч
-	"ability_fireball": "",     # Огненный шар
-	"ability_taunt": "",        # Провокация
+	"ability_beam": "res://sounds/abbility_beam.wav",         # Луч
+	"ability_fireball": "res://sounds/ability_fireball.wav",     # Огненный шар
+	"ability_taunt": "res://sounds/ability_taunt.wav",        # Провокация
 	
 	# Звуки мобов
-	"mob_hurt": "",             # Моб получает урон
-	"mob_death": "",            # Смерть моба
+	"mob_hurt": "res://sounds/mob_hurt.wav",             # Моб получает урон
+	"mob_death": "res://sounds/mob_death.wav",            # Смерть моба
 	"mob_attack": "",           # Атака моба
 	
 	# UI звуки
-	"ui_click": "",             # Клик по UI
-	"ui_upgrade": "",           # Улучшение навыка
+	"ui_click": "res://sounds/ui_click.wav",             # Клик по UI
+	"ui_upgrade": "res://sounds/ui_upgrade.wav",           # Улучшение навыка
 }
 
 # Количество одновременных AudioStreamPlayer для полифонии
@@ -40,7 +40,7 @@ var current_player_index_2d: int = 0
 var current_player_index: int = 0
 
 # Громкости по категориям (можно настроить в меню)
-var master_volume: float = 1.0
+var master_volume: float = 0.01
 var sfx_volume: float = 1.0
 var music_volume: float = 1.0
 
