@@ -1,62 +1,243 @@
-[gd_scene load_steps=4 format=3 uid="uid://ckc5nxrmdil2e"]
+[gd_scene load_steps=14 format=3 uid="uid://ckc5nxrmdil2e"]
 
 [ext_resource type="Script" uid="uid://0jtoqbv82fcs" path="res://scripts/player_characters/player_ui.gd" id="1_jkj6h"]
 [ext_resource type="Script" uid="uid://ch414lg3stwmt" path="res://scripts/player_characters/ability_upgrade_ui.gd" id="2_upgrade"]
+[ext_resource type="Script" uid="uid://pxft82i1blcj" path="res://scripts/ui/value_bar.gd" id="3_valuebar"]
+[ext_resource type="Texture2D" uid="uid://c4rxm8scj221x" path="res://assets/sprites/Spritesheet_UI_Flat.png" id="4_8isll"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_hp"]
+bg_color = Color(0.8, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [sub_resource type="LabelSettings" id="LabelSettings_guxnq"]
-font_size = 30
+font_size = 20
 font_color = Color(0.73333335, 1, 0, 1)
 
-[node name="Control" type="CanvasLayer" node_paths=PackedStringArray("hp", "st", "mp", "ep", "lvl", "ability_upgrade_ui", "respawn_timer_label")]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_mana"]
+bg_color = Color(0.2, 0.4, 0.9, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_stamina"]
+bg_color = Color(0.9, 0.7, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_experience"]
+bg_color = Color(0.6, 0.2, 0.9, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8isll"]
+atlas = ExtResource("4_8isll")
+region = Rect2(224, 32, 96, 64)
+
+[sub_resource type="LabelSettings" id="LabelSettings_7ctsh"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ctsh"]
+atlas = ExtResource("4_8isll")
+region = Rect2(32, 32, 96, 64)
+
+[node name="Control" type="CanvasLayer" node_paths=PackedStringArray("hp_bar", "stamina_bar", "mana_bar", "experience_bar", "ability_upgrade_ui", "respawn_timer_label")]
 script = ExtResource("1_jkj6h")
-hp = NodePath("hp")
-st = NodePath("mp")
-mp = NodePath("sp")
-ep = NodePath("ep")
-lvl = NodePath("lvl")
+hp_bar = NodePath("hp")
+stamina_bar = NodePath("sp")
+mana_bar = NodePath("mp")
+experience_bar = NodePath("ep")
 ability_upgrade_ui = NodePath("AbilityUpgradeUI")
 respawn_timer_label = NodePath("RespawnTimerLabel")
 
-[node name="hp" type="Label" parent="."]
+[node name="hp" type="Control" parent="."]
 z_index = 3
-offset_left = 37.0
-offset_top = 405.0
-offset_right = 86.0
-offset_bottom = 447.0
-text = "ЗД:"
-label_settings = SubResource("LabelSettings_guxnq")
+layout_mode = 3
+anchors_preset = 0
+offset_left = -42.0
+offset_top = 474.0
+offset_right = 258.0
+offset_bottom = 516.0
+script = ExtResource("3_valuebar")
+label_text = "ЗД:"
 
-[node name="mp" type="Label" parent="."]
-offset_left = 37.0
-offset_top = 447.0
-offset_right = 86.0
-offset_bottom = 489.0
-text = "МН:"
-label_settings = SubResource("LabelSettings_guxnq")
+[node name="ProgressBar" type="ProgressBar" parent="hp"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_right = 0.75
+anchor_bottom = 1.0
+offset_left = 11.0
+offset_top = 71.0
+offset_right = 1.0
+offset_bottom = 71.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.5)
+theme_override_styles/background = SubResource("StyleBoxFlat_progress")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill_hp")
+value = 100.0
+show_percentage = false
 
-[node name="sp" type="Label" parent="."]
-offset_left = 37.0
-offset_top = 489.0
-offset_right = 86.0
-offset_bottom = 531.0
-text = "ВЫН:"
+[node name="ValueLabel" type="Label" parent="hp"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = 65.0
+offset_right = -95.0
+offset_bottom = 65.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "100 / 100"
 label_settings = SubResource("LabelSettings_guxnq")
+horizontal_alignment = 1
 
-[node name="ep" type="Label" parent="."]
-offset_left = 37.0
-offset_top = 531.0
-offset_right = 86.0
-offset_bottom = 573.0
-text = "ОПЫТ:"
-label_settings = SubResource("LabelSettings_guxnq")
+[node name="mp" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -42.0
+offset_top = 516.0
+offset_right = 258.0
+offset_bottom = 558.0
+script = ExtResource("3_valuebar")
+label_text = "МН:"
 
-[node name="lvl" type="Label" parent="."]
-offset_left = 37.0
-offset_top = 573.0
-offset_right = 86.0
-offset_bottom = 615.0
-text = "УР:"
+[node name="ProgressBar" type="ProgressBar" parent="mp"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_right = 0.75
+anchor_bottom = 1.0
+offset_left = 11.0
+offset_top = 55.0
+offset_right = 1.0
+offset_bottom = 55.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.5)
+theme_override_styles/background = SubResource("StyleBoxFlat_progress")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill_mana")
+value = 100.0
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="mp"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = 49.0
+offset_right = -95.0
+offset_bottom = 49.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "100 / 100"
 label_settings = SubResource("LabelSettings_guxnq")
+horizontal_alignment = 1
+
+[node name="sp" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -42.0
+offset_top = 558.0
+offset_right = 258.0
+offset_bottom = 600.0
+script = ExtResource("3_valuebar")
+label_text = "ВЫН:"
+
+[node name="ProgressBar" type="ProgressBar" parent="sp"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_right = 0.75
+anchor_bottom = 1.0
+offset_left = 11.0
+offset_top = 39.0
+offset_right = 1.0
+offset_bottom = 39.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.5)
+theme_override_styles/background = SubResource("StyleBoxFlat_progress")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill_stamina")
+value = 100.0
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="sp"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = 33.0
+offset_right = -95.0
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "100 / 100"
+label_settings = SubResource("LabelSettings_guxnq")
+horizontal_alignment = 1
+
+[node name="ep" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -42.0
+offset_top = 600.0
+offset_right = 258.0
+offset_bottom = 642.0
+script = ExtResource("3_valuebar")
+label_text = "ОПЫТ:"
+
+[node name="ProgressBar" type="ProgressBar" parent="ep"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_right = 0.75
+anchor_bottom = 1.0
+offset_left = 11.0
+offset_top = 22.0
+offset_right = 1.0
+offset_bottom = 22.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 0.5)
+theme_override_styles/background = SubResource("StyleBoxFlat_progress")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill_experience")
+show_percentage = false
+
+[node name="ValueLabel" type="Label" parent="ep"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -133.0
+offset_top = 16.0
+offset_right = -112.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "0 / 100"
+label_settings = SubResource("LabelSettings_guxnq")
+horizontal_alignment = 1
 
 [node name="RespawnTimerLabel" type="Label" parent="."]
 visible = false
@@ -94,7 +275,7 @@ script = ExtResource("2_upgrade")
 abilities_container = NodePath("Panel/VBoxContainer")
 title_label = NodePath("Panel/TitleLabel")
 
-[node name="Panel" type="Panel" parent="AbilityUpgradeUI"]
+[node name="Panel" type="TextureRect" parent="AbilityUpgradeUI"]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0580001
@@ -102,20 +283,32 @@ anchor_bottom = 1.0
 offset_right = -6.1035156e-05
 grow_horizontal = 2
 grow_vertical = 2
+texture = SubResource("AtlasTexture_8isll")
 
 [node name="TitleLabel" type="Label" parent="AbilityUpgradeUI/Panel"]
 layout_mode = 0
-offset_left = 20.0
-offset_top = 15.0
-offset_right = 480.0
-offset_bottom = 50.0
-text = "УРОВЕНЬ ПОВЫШЕН! Выберите способность для улучшения:"
+offset_left = 17.0
+offset_top = 16.0
+offset_right = 511.0
+offset_bottom = 65.0
+text = "УРОВЕНЬ ПОВЫШЕН!
+Выберите способность для улучшения"
+label_settings = SubResource("LabelSettings_7ctsh")
 horizontal_alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="AbilityUpgradeUI/Panel"]
 layout_mode = 0
 offset_left = 20.0
-offset_top = 60.0
+offset_top = 66.0
 offset_right = 506.0
 offset_bottom = 380.0
 theme_override_constants/separation = 10
+
+[node name="bars_panel" type="TextureRect" parent="."]
+z_index = -1
+offset_left = 5.0
+offset_top = 532.0
+offset_right = 101.0
+offset_bottom = 596.0
+scale = Vector2(1.9599998, 2.7199998)
+texture = SubResource("AtlasTexture_7ctsh")

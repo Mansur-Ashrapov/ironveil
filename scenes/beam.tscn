@@ -3,8 +3,11 @@
 [ext_resource type="Script" uid="uid://bi5e8l5drlrb1" path="res://scripts/abilities/beam/beam.gd" id="1_beam"]
 
 [sub_resource type="Gradient" id="Gradient_beam"]
-offsets = PackedFloat32Array(0, 0.5, 1)
-colors = PackedColorArray(1, 1, 1, 0, 0.6, 0.9, 1, 1, 1, 1, 1, 0)
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.5106383, 1)
+colors = PackedColorArray(1, 1, 1, 0, 0.7792914, 0.7792914, 0.7792913, 1, 1, 1, 1, 0)
+metadata/_snap_count = 2
+metadata/_snap_enabled = true
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_beam"]
 gradient = SubResource("Gradient_beam")

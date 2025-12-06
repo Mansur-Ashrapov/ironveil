@@ -39,6 +39,10 @@ func _start_charging() -> void:
 func _fire() -> void:
 	state = State.FIRED
 	
+	# Проигрываем звук после завершения зарядки
+	if user and is_instance_valid(user):
+		user._sync_sound.rpc("ability_beam")
+	
 	# Синхронизируем визуал на всех клиентах
 	sync_fire.rpc(direction.angle())
 	

@@ -1,13 +1,22 @@
-[gd_scene load_steps=7 format=3 uid="uid://cwgldckefibmk"]
+[gd_scene load_steps=10 format=3 uid="uid://cwgldckefibmk"]
 
 [ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
 [ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
 [ext_resource type="Script" uid="uid://ckq8iqqlp2qwm" path="res://scripts/multiplayer/networks/network_manager.gd" id="2_ofxfn"]
+[ext_resource type="Texture2D" uid="uid://c4rxm8scj221x" path="res://assets/sprites/Spritesheet_UI_Flat.png" id="3_5lcxu"]
 [ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="3_ofxfn"]
 [ext_resource type="PackedScene" uid="uid://b4wlhb7ae0w0v" path="res://scenes/map.tscn" id="5_2dvlx"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_b3d1v"]
+atlas = ExtResource("3_5lcxu")
+region = Rect2(31.917051, 31.96077, 96.149216, 64.05053)
+
 [sub_resource type="LabelSettings" id="LabelSettings_cc156"]
 font_size = 29
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5lcxu"]
+atlas = ExtResource("3_5lcxu")
+region = Rect2(31.999647, 31.989338, 96.04585, 64.01529)
 
 [node name="steam" type="Node2D" groups=["root"]]
 
@@ -31,20 +40,25 @@ offset_right = 271.0
 offset_bottom = 231.0
 scale = Vector2(2.4482765, 2.6173155)
 
-[node name="Panel" type="Panel" parent="HUD/CanvasLayer/MultiplayerHUD"]
+[node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/MultiplayerHUD"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = -33.915543
-offset_bottom = -68.53885
+offset_left = -1.2253513
+offset_top = -2.2924252
+offset_right = -17.985962
+offset_bottom = -44.08632
 grow_horizontal = 2
 grow_vertical = 2
+texture = SubResource("AtlasTexture_b3d1v")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/MultiplayerHUD/Panel"]
 layout_mode = 0
-offset_right = 177.0
-offset_bottom = 68.0
+offset_left = 9.8028145
+offset_top = 12.99041
+offset_right = 186.25383
+offset_bottom = 104.99041
 
 [node name="HostGame" type="Button" parent="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer"]
 layout_mode = 2
@@ -78,7 +92,7 @@ offset_right = 180.0
 offset_bottom = 174.0
 scale = Vector2(3.6164927, 3.338871)
 
-[node name="Panel" type="Panel" parent="HUD/CanvasLayer/SteamHUD"]
+[node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/SteamHUD"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -141,8 +155,8 @@ offset_top = 97.0
 offset_right = 712.0
 offset_bottom = 224.0
 text = "WASD - move
-SPACE - sword attack
-RMB - FIREBALL
+SPACE - first ability
+RMB - second ability
 
 MOUSE AIM NOT WORKING"
 
@@ -157,23 +171,26 @@ offset_right = 300.0
 offset_bottom = 280.0
 scale = Vector2(2.5, 2.5)
 
-[node name="Panel" type="Panel" parent="HUD/CanvasLayer/CharacterSelectHUD"]
+[node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/CharacterSelectHUD"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -0.4000244
+offset_bottom = 10.799988
 grow_horizontal = 2
 grow_vertical = 2
+texture = SubResource("AtlasTexture_5lcxu")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -5.0
+offset_left = 8.4
+offset_top = 9.200001
+offset_right = -8.799988
+offset_bottom = -14.400009
 grow_horizontal = 2
 grow_vertical = 2
 

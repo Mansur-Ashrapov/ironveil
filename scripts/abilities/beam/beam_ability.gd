@@ -11,6 +11,10 @@ func _init() -> void:
 
 const BEAM_OFFSET_DISTANCE: float = 60.0
 
+func use(user: PlayerBase):
+	last_used_time = Time.get_ticks_msec() / 1000.0
+	_on_use(user)
+
 func _on_use(user: PlayerBase):
 	var beam: Beam = beam_scene.instantiate()
 	beam.get_ready(user.base_damage * 2.0)  # Луч наносит двойной урон
