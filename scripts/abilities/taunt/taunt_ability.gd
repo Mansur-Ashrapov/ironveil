@@ -7,6 +7,7 @@ var taunt_effect_scene: PackedScene = preload("res://scenes/taunt_effect.tscn")
 @export var taunt_duration: float = 5.0
 
 func _init() -> void:
+	ability_name = "Taunt"
 	cooldown = 10.0
 	stamina_cost = 15.0
 	mana_cost = 10.0

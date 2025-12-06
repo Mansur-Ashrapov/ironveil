@@ -45,6 +45,8 @@ signal parameters_changed(new_health: int, new_mana: int, new_stamina: int, new_
 signal get_hit()
 signal used_ability(ability_name: String)
 signal changed_direction(new_diretion: Vector2)
+signal show_ability_upgrade_ui(abilities: Array)  # Показать UI выбора навыка для прокачки
+signal ability_upgraded(ability_idx: int, new_level: int)  # Навык улучшен
 
 # POSITION INTERPOLATION
 var state_buffer := [] # Буффер передвижений игрока
@@ -69,7 +71,10 @@ func _ready() -> void:
 	regen_timer.timeout.connect(_on_regen_tick)
 
 func _on_regen_tick() -> void:
-	if not game_started and not multiplayer.is_server():
+	if not game_started:
+		return
+	
+	if not multiplayer.is_server():
 		return
 
 	# Применяем восстановление
@@ -88,7 +93,9 @@ func _enter_tree() -> void:
 		player_camera = Camera2D.new()
 		self.add_child(player_camera)
 		parameters_changed.connect(player_ui.new_parameters)
-		sync_parameters.rpc(health, mana, stamina, experience, level)
+		player_ui.setup(self)  # Настройка UI с ссылкой на игрока
+		# Начальное обновление UI (данные синхронизируются через MultiplayerSynchronizer)
+		parameters_changed.emit(health, mana, stamina, experience, level)
 	else:
 		player_ui.queue_free()
 
@@ -149,9 +156,15 @@ func _handle_abilities_input() -> void:
 func take_damage(amount: float):
 	health -= amount
 	get_hit.emit()
+	
+	# Синхронизируем звук получения урона на всех клиентах
+	_sync_sound.rpc("player_hurt")
 
 	if health <= 0:
 		print("spookie spokie skeleton")
+		# Звук смерти только для владельца
+		if is_multiplayer_authority():
+			SoundManager.play_sound("player_death", global_position)
 
 	sync_parameters.rpc(health, mana, stamina, experience, level)
 
@@ -171,6 +184,33 @@ func level_up():
 	max_mana += mana_per_level
 	max_health += health_per_level
 	base_damage += damage_per_level
+	
+	# Показываем UI и играем звук только для владельца
+	if is_multiplayer_authority():
+		SoundManager.play_sound("player_level_up", global_position)
+		show_ability_upgrade_ui.emit(abilities_instances)
+
+# Улучшить навык по индексу (вызывается из UI)
+func request_upgrade_ability(ability_idx: int):
+	if is_multiplayer_authority():
+		server_upgrade_ability.rpc_id(1, ability_idx)
+
+@rpc("any_peer", "reliable", "call_local")
+func server_upgrade_ability(ability_idx: int):
+	if not multiplayer.is_server(): return
+	
+	if ability_idx >= 0 and ability_idx < abilities_instances.size():
+		var ability = abilities_instances[ability_idx] as Ability
+		if ability.can_upgrade():
+			ability.upgrade()
+			# Синхронизируем уровень навыка со всеми клиентами
+			sync_ability_level.rpc(ability_idx, ability.ability_level)
+
+@rpc("any_peer", "reliable", "call_local")
+func sync_ability_level(ability_idx: int, new_level: int):
+	if ability_idx >= 0 and ability_idx < abilities_instances.size():
+		(abilities_instances[ability_idx] as Ability).ability_level = new_level
+		ability_upgraded.emit(ability_idx, new_level)
 
 func start_game():
 	_start_game.rpc()
@@ -192,8 +232,9 @@ func server_use_ability(ability_idx: int):
 	if not multiplayer.is_server(): return
 	if abilities_instances.size() > ability_idx and abilities_instances[ability_idx].can_use(mana, stamina):
 		abilities_instances[ability_idx].use(self)
-		mana -= (abilities_instances[ability_idx] as Ability).mana_cost
-		stamina -= (abilities_instances[ability_idx] as Ability).stamina_cost
+		var ability = abilities_instances[ability_idx] as Ability
+		mana -= ability.get_effective_mana_cost()
+		stamina -= ability.get_effective_stamina_cost()
 		sync_parameters.rpc(health, mana, stamina, experience, level)
 		sync_ability.rpc(ability_idx)
 
@@ -212,3 +253,8 @@ func sync_parameters(new_health: float, new_mana: float, new_stamina: float, new
 	experience = new_experience
 	level = new_lvl
 	parameters_changed.emit(new_health, new_mana, new_stamina, new_experience, new_lvl)
+
+# Синхронизация звуков на всех клиентах
+@rpc("any_peer", "reliable", "call_local")
+func _sync_sound(sound_key: String) -> void:
+	SoundManager.play_sound(sound_key, global_position)

@@ -88,7 +88,7 @@ func _deal_raycast_damage() -> void:
 			var to_mob = mob.global_position - beam_start
 			var dot = to_mob.dot(direction)
 			if dot > 0 and dot < BEAM_LENGTH:
-				(mob as MobBase).get_damage(damage, beam_start)
+				(mob as MobBase).take_damage(damage, beam_start)
 
 func _point_to_line_distance(point: Vector2, line_start: Vector2, line_end: Vector2) -> float:
 	var line_vec = line_end - line_start

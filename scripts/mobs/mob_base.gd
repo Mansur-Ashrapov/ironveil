@@ -16,7 +16,7 @@ const AGRO_RADIUS = 300
 # Сила отбрасывания при получении урона
 const KNOCKBACK_FORCE = 200
 # Длительность отбрасывания в секундах
-const KNOCKBACK_DURATION = 0.2
+const KNOCKBACK_DURATION = 0.35
 const DEATH_DELAY = 0.25
 
 var target_player: Node2D
@@ -67,16 +67,21 @@ func find_nearest_player() -> bool:
 	target_player = nearest_player
 	return target_player != null
 
-func get_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
+func take_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
 	health -= amount
 	
 	get_hit.emit()
+	
+	# Синхронизируем звук получения урона на всех клиентах
+	_sync_sound.rpc("mob_hurt")
 	
 	# Применяем импульс/отбрасывание
 	if damage_source_position != Vector2.ZERO:
 		apply_knockback(damage_source_position)
 	
 	if health <= 0 and multiplayer.is_server():
+		# Синхронизируем звук смерти на всех клиентах
+		_sync_sound.rpc("mob_death")
 		for player in get_all_players():
 			if player is PlayerBase:
 				player.get_experience(experience_cost)
@@ -94,6 +99,11 @@ func apply_knockback(damage_source_position: Vector2):
 @rpc("any_peer", "call_local", "reliable")
 func death():
 	queue_free()
+
+# Синхронизация звуков на всех клиентах
+@rpc("any_peer", "reliable", "call_local")
+func _sync_sound(sound_key: String) -> void:
+	SoundManager.play_sound(sound_key, global_position)
 
 func get_all_players() -> Array:
 	var players = []
@@ -122,7 +132,7 @@ func force_aggro(player: PlayerBase, duration: float = -1.0):
 		print("[MOB ", name, "] Player invalid or queued for deletion")
 		return
 	
-	var old_target = target_player.name if target_player else "none"
+	var old_target = str(target_player.name) if target_player else "none" 
 	forced_target_player = player
 	forced_aggro_timer = duration
 	target_player = player  # Сразу устанавливаем цель

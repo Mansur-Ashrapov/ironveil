@@ -1,18 +1,20 @@
-[gd_scene load_steps=3 format=3 uid="uid://ckc5nxrmdil2e"]
+[gd_scene load_steps=4 format=3 uid="uid://ckc5nxrmdil2e"]
 
 [ext_resource type="Script" uid="uid://0jtoqbv82fcs" path="res://scripts/player_characters/player_ui.gd" id="1_jkj6h"]
+[ext_resource type="Script" uid="uid://ch414lg3stwmt" path="res://scripts/player_characters/ability_upgrade_ui.gd" id="2_upgrade"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_guxnq"]
 font_size = 30
 font_color = Color(0.73333335, 1, 0, 1)
 
-[node name="Control" type="CanvasLayer" node_paths=PackedStringArray("hp", "st", "mp", "ep", "lvl")]
+[node name="Control" type="CanvasLayer" node_paths=PackedStringArray("hp", "st", "mp", "ep", "lvl", "ability_upgrade_ui")]
 script = ExtResource("1_jkj6h")
 hp = NodePath("hp")
 st = NodePath("mp")
 mp = NodePath("sp")
 ep = NodePath("ep")
 lvl = NodePath("lvl")
+ability_upgrade_ui = NodePath("AbilityUpgradeUI")
 
 [node name="hp" type="Label" parent="."]
 z_index = 3
@@ -20,7 +22,7 @@ offset_left = 37.0
 offset_top = 405.0
 offset_right = 86.0
 offset_bottom = 447.0
-text = "HP:"
+text = "ЗД:"
 label_settings = SubResource("LabelSettings_guxnq")
 
 [node name="mp" type="Label" parent="."]
@@ -28,7 +30,7 @@ offset_left = 37.0
 offset_top = 447.0
 offset_right = 86.0
 offset_bottom = 489.0
-text = "MP:"
+text = "МН:"
 label_settings = SubResource("LabelSettings_guxnq")
 
 [node name="sp" type="Label" parent="."]
@@ -36,7 +38,7 @@ offset_left = 37.0
 offset_top = 489.0
 offset_right = 86.0
 offset_bottom = 531.0
-text = "SP:"
+text = "ВЫН:"
 label_settings = SubResource("LabelSettings_guxnq")
 
 [node name="ep" type="Label" parent="."]
@@ -44,7 +46,7 @@ offset_left = 37.0
 offset_top = 531.0
 offset_right = 86.0
 offset_bottom = 573.0
-text = "EXP:"
+text = "ОПЫТ:"
 label_settings = SubResource("LabelSettings_guxnq")
 
 [node name="lvl" type="Label" parent="."]
@@ -52,5 +54,48 @@ offset_left = 37.0
 offset_top = 573.0
 offset_right = 86.0
 offset_bottom = 615.0
-text = "LVL:"
+text = "УР:"
 label_settings = SubResource("LabelSettings_guxnq")
+
+[node name="AbilityUpgradeUI" type="Control" parent="." node_paths=PackedStringArray("abilities_container", "title_label")]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_upgrade")
+abilities_container = NodePath("Panel/VBoxContainer")
+title_label = NodePath("Panel/TitleLabel")
+
+[node name="Panel" type="Panel" parent="AbilityUpgradeUI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0580001
+anchor_bottom = 1.0
+offset_right = -6.1035156e-05
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="AbilityUpgradeUI/Panel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 480.0
+offset_bottom = 50.0
+text = "УРОВЕНЬ ПОВЫШЕН! Выберите способность для улучшения:"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="AbilityUpgradeUI/Panel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 506.0
+offset_bottom = 380.0
+theme_override_constants/separation = 10

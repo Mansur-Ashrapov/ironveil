@@ -4,6 +4,7 @@ class_name FireballAbility
 var fireball_scene: PackedScene = preload("res://scenes/fireball.tscn")
 
 func _init() -> void:
+	ability_name = "Fireball"
 	cooldown = 1.5
 	stamina_cost = 5
 	mana_cost = 20

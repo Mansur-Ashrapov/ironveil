@@ -4,6 +4,7 @@ class_name BeamAbility
 var beam_scene: PackedScene = preload("res://scenes/beam.tscn")
 
 func _init() -> void:
+	ability_name = "Beam"
 	cooldown = 2.5
 	stamina_cost = 10
 	mana_cost = 25

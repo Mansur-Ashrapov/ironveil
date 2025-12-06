@@ -1,0 +1,176 @@
+[gd_scene load_steps=16 format=3 uid="uid://cm02x5j26bk0p"]
+
+[ext_resource type="Script" uid="uid://cxujnvfnqx5w3" path="res://scripts/player_characters/player_base.gd" id="1_jkaa8"]
+[ext_resource type="Script" uid="uid://bgtt12tk47epa" path="res://scripts/abilities/fireball/fireball_ability.gd" id="2_6tlup"]
+[ext_resource type="Script" uid="uid://qinovanow8b8" path="res://scripts/abilities/beam/beam_ability.gd" id="3_4nj6g"]
+[ext_resource type="PackedScene" uid="uid://ckc5nxrmdil2e" path="res://scenes/player_ui.tscn" id="4_pvx47"]
+[ext_resource type="Texture2D" uid="uid://cadmsq53mptb0" path="res://assets/sprites/sheet.png" id="5_mhad4"]
+[ext_resource type="Script" uid="uid://cx62di5gmvb48" path="res://scripts/player_characters/player_base_animation_controller.gd" id="6_utabi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7g6sa"]
+size = Vector2(60, 71)
+
+[sub_resource type="Animation" id="Animation_kfj5c"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Char-sheet:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_rhx3x"]
+resource_name = "attack"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Char-sheet:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_5lknd"]
+resource_name = "get_hit"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Char-sheet:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [7]
+}
+
+[sub_resource type="Animation" id="Animation_hquwp"]
+resource_name = "idle"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Char-sheet:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [6, 7]
+}
+
+[sub_resource type="Animation" id="Animation_hc1dv"]
+resource_name = "moving"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Char-sheet:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [1, 2]
+}
+
+[sub_resource type="Animation" id="Animation_dtrl1"]
+resource_name = "new_animation"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hc1dv"]
+_data = {
+&"RESET": SubResource("Animation_kfj5c"),
+&"ability0": SubResource("Animation_rhx3x"),
+&"get_hit": SubResource("Animation_5lknd"),
+&"idle": SubResource("Animation_hquwp"),
+&"moving": SubResource("Animation_hc1dv"),
+&"new_animation": SubResource("Animation_dtrl1")
+}
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_eio8i"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath("AnimationPlayer:current_animation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:direction")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath("Char-sheet:flip_h")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+properties/4/path = NodePath(".:game_started")
+properties/4/spawn = true
+properties/4/replication_mode = 1
+properties/5/path = NodePath(".:health")
+properties/5/spawn = true
+properties/5/replication_mode = 1
+properties/6/path = NodePath(".:mana")
+properties/6/spawn = true
+properties/6/replication_mode = 1
+properties/7/path = NodePath(".:stamina")
+properties/7/spawn = true
+properties/7/replication_mode = 1
+properties/8/path = NodePath(".:experience")
+properties/8/spawn = true
+properties/8/replication_mode = 1
+properties/9/path = NodePath(".:level")
+properties/9/spawn = true
+properties/9/replication_mode = 1
+properties/10/path = NodePath(".:max_health")
+properties/10/spawn = true
+properties/10/replication_mode = 1
+properties/11/path = NodePath(".:max_mana")
+properties/11/spawn = true
+properties/11/replication_mode = 1
+properties/12/path = NodePath(".:max_stamina")
+properties/12/spawn = true
+properties/12/replication_mode = 1
+
+[node name="Magician" type="CharacterBody2D" node_paths=PackedStringArray("player_ui", "animation_controller", "sprite")]
+z_index = 3
+y_sort_enabled = true
+collision_mask = 2
+script = ExtResource("1_jkaa8")
+player_ui = NodePath("Control")
+animation_controller = NodePath("AnimationPlayer")
+sprite = NodePath("Char-sheet")
+abilities = [ExtResource("2_6tlup"), ExtResource("3_4nj6g")]
+
+[node name="Control" parent="." instance=ExtResource("4_pvx47")]
+
+[node name="Char-sheet" type="Sprite2D" parent="."]
+scale = Vector2(10, 10)
+texture = ExtResource("5_mhad4")
+hframes = 3
+vframes = 3
+region_rect = Rect2(0, 0, 8, 8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(1, 4.5)
+shape = SubResource("RectangleShape2D_7g6sa")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_hc1dv")
+}
+script = ExtResource("6_utabi")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_eio8i")

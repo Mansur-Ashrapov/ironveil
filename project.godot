@@ -19,6 +19,7 @@ config/icon="res://assets/sprites/icon.svg"
 
 MultiplayerManager="*res://scripts/multiplayer/multiplayer_manager.gd"
 SteamManager="*res://scripts/multiplayer/steam/steam_manager.gd"
+SoundManager="*res://scripts/sound_manager.gd"
 
 [global_group]
 

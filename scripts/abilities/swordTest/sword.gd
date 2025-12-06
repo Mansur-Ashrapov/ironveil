@@ -19,4 +19,4 @@ func get_ready(_damage: float):
 
 func _on_body_entered(body: Node2D):
 	if body is MobBase and multiplayer.is_server():
-		body.get_damage(damage, global_position)
+		body.take_damage(damage, global_position)

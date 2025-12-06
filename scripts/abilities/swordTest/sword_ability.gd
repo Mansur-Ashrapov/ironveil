@@ -4,6 +4,7 @@ class_name SwordAbility
 var sword_scene: PackedScene = preload("res://scenes/sword_test.tscn")
 
 func _init() -> void:
+	ability_name = "Sword"
 	cooldown = 0.7
 	stamina_cost = 5
 	mana_cost = 0

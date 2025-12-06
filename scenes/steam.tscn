@@ -146,13 +146,90 @@ RMB - FIREBALL
 
 MOUSE AIM NOT WORKING"
 
+[node name="CharacterSelectHUD" type="Control" parent="HUD/CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 60.0
+offset_top = 70.0
+offset_right = 300.0
+offset_bottom = 280.0
+scale = Vector2(2.5, 2.5)
+
+[node name="Panel" type="Panel" parent="HUD/CanvasLayer/CharacterSelectHUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Select Character"
+horizontal_alignment = 1
+
+[node name="CharacterButtons" type="HBoxContainer" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="SwordsmanBtn" type="Button" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons"]
+custom_minimum_size = Vector2(70, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Swordsman"
+
+[node name="MagicianBtn" type="Button" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons"]
+custom_minimum_size = Vector2(70, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Magician"
+
+[node name="SelectedLabel" type="Label" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Selected: None"
+horizontal_alignment = 1
+
+[node name="Separator" type="HSeparator" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="PlayersLabel" type="Label" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Players in lobby:"
+
+[node name="PlayersList" type="VBoxContainer" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ReadyBtn" type="Button" parent="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+disabled = true
+text = "Ready"
+
 [node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("players_spawn_node")]
 unique_name_in_owner = true
 script = ExtResource("2_ofxfn")
 players_spawn_node = NodePath("../Players")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://v3d1ogl7dbfk")
+_spawnable_scenes = PackedStringArray("uid://ci78f8q582qc", "uid://cm02x5j26bk0p")
 spawn_path = NodePath("../Players")
 spawn_limit = 10
 
@@ -290,10 +367,13 @@ position = Vector2(1534, -608)
 [node name="map" parent="." instance=ExtResource("5_2dvlx")]
 position = Vector2(598, -50)
 
-[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="become_host"]
-[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="join_as_client"]
+[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="show_character_select_host"]
+[connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="show_character_select_client"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/UseSteam" to="HUD" method="use_steam"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/TEST SOLO" to="HUD" method="play_solo"]
-[connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/HostP2PGame" to="HUD" method="become_host"]
+[connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/HostP2PGame" to="HUD" method="show_character_select_host"]
 [connection signal="pressed" from="HUD/CanvasLayer/SteamHUD/Panel/Options/ListLobbies" to="HUD" method="list_steam_lobbies"]
 [connection signal="pressed" from="HUD/CanvasLayer/restart" to="HUD" method="_on_restart_pressed"]
+[connection signal="pressed" from="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/SwordsmanBtn" to="HUD" method="select_swordsman"]
+[connection signal="pressed" from="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/MagicianBtn" to="HUD" method="select_magician"]
+[connection signal="pressed" from="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn" to="HUD" method="on_ready_pressed"]
