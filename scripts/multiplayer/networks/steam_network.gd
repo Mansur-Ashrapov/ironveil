@@ -223,6 +223,11 @@ func _spawn_all_players():
 func _add_player_to_game(id: int):
 	print("Player %s joined the game!" % id)
 	
+	# Проверяем, что выбор персонажа зарегистрирован
+	if not player_characters.has(id):
+		push_error("Player %s character choice not registered! Cannot spawn player." % id)
+		return
+	
 	var char_type = player_characters.get(id, "swordsman")
 	var scene = swordsman_scene if char_type == "swordsman" else magician_scene
 	var player_to_add = scene.instantiate()

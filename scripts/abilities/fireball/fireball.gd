@@ -135,15 +135,26 @@ func _deal_explosion_damage() -> void:
 	if not multiplayer.is_server():
 		return
 	
-	var mobs = get_tree().get_nodes_in_group("mob")
-	for mob in mobs:
-		if not _is_mob_valid(mob):
-			continue
-		
-		var dist = global_position.distance_to(mob.global_position)
-		if dist <= explosion_radius:
-			if mob is MobBase:
-				mob.take_damage(damage, global_position)
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsShapeQueryParameters2D.new()
+	
+	# Создаём круглую форму для области взрыва
+	var circle_shape = CircleShape2D.new()
+	circle_shape.radius = explosion_radius
+	query.shape = circle_shape
+	query.transform.origin = global_position
+	query.collision_mask = 4  # Слой мобов (collision_layer = 4)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	
+	# Выполняем запрос
+	var results = space_state.intersect_shape(query)
+	
+	# Обрабатываем результаты
+	for result in results:
+		var body = result.get("collider")
+		if body is MobBase and _is_mob_valid(body):
+			body.take_damage(damage, global_position)
 
 func _on_body_entered(_body: Node2D):
 	if not multiplayer.is_server():

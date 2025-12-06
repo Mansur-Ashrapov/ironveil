@@ -37,6 +37,9 @@ var health := max_health
 var stamina := max_stamina
 var mana := max_mana
 
+# Счетчик непотраченных уровней (для очереди прокачки)
+var pending_upgrades: int = 0
+
 var last_direction: Vector2 = Vector2(1, 0) # нужен чтобы не отправлять Vector2.ZERO при отсутсвии инпута и наоборот, если инпут не меняется, сохранять прошлый
 var can_move: bool = true # когда персонаж использует абилку, не может двигаться
 
@@ -185,10 +188,31 @@ func level_up():
 	max_health += health_per_level
 	base_damage += damage_per_level
 	
-	# Показываем UI и играем звук только для владельца
+	# Если мы являемся владельцем игрока, увеличиваем счетчик и показываем UI напрямую
 	if is_multiplayer_authority():
-		SoundManager.play_sound("player_level_up", global_position)
-		show_ability_upgrade_ui.emit(abilities_instances)
+		pending_upgrades += 1
+		_show_upgrade_ui_local()
+	# Если мы на сервере, но не являемся владельцем, отправляем RPC клиенту-владельцу
+	elif multiplayer.is_server():
+		var player_peer_id = get_multiplayer_authority()
+		if player_peer_id != 0:
+			client_show_upgrade_ui.rpc_id(player_peer_id)
+
+func _show_upgrade_ui_local():
+	# Показываем UI только если он еще не открыт
+	if player_ui and player_ui.ability_upgrade_ui:
+		if not player_ui.ability_upgrade_ui.visible:
+			# Проигрываем звук только при первом показе (когда UI был закрыт)
+			SoundManager.play_sound("player_level_up", global_position)
+			show_ability_upgrade_ui.emit(abilities_instances)
+
+@rpc("any_peer", "reliable", "call_local")
+func client_show_upgrade_ui():
+	# Этот метод вызывается на клиенте-владельце игрока
+	if is_multiplayer_authority():
+		# Увеличиваем счетчик непотраченных уровней на клиенте
+		pending_upgrades += 1
+		_show_upgrade_ui_local()
 
 # Улучшить навык по индексу (вызывается из UI)
 func request_upgrade_ability(ability_idx: int):
@@ -211,6 +235,15 @@ func sync_ability_level(ability_idx: int, new_level: int):
 	if ability_idx >= 0 and ability_idx < abilities_instances.size():
 		(abilities_instances[ability_idx] as Ability).ability_level = new_level
 		ability_upgraded.emit(ability_idx, new_level)
+		
+		# Уменьшаем счетчик непотраченных уровней и показываем следующее окно, если есть
+		if is_multiplayer_authority():
+			pending_upgrades = max(0, pending_upgrades - 1)
+			if pending_upgrades > 0:
+				# Показываем следующее окно выбора улучшения с небольшой задержкой
+				# чтобы текущее окно успело закрыться
+				await get_tree().process_frame
+				_show_upgrade_ui_local()
 
 func start_game():
 	_start_game.rpc()
