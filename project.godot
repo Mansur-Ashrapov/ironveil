@@ -28,6 +28,7 @@ server_sync=""
 mob=""
 root=""
 trash=""
+level_tilemap=""
 
 [input]
 
