@@ -6,7 +6,7 @@ extends CanvasLayer
 @export var ep: Label
 @export var lvl: Label
 
-func new_parametrs(new_health: int, new_mana: int, new_stamina: int, new_experience: int, new_lvl: int):
+func new_parameters(new_health: int, new_mana: int, new_stamina: int, new_experience: int, new_lvl: int):
 	hp.text = "HP: " + str(new_health)
 	st.text = "ST: " + str(new_stamina)
 	mp.text = "MP: " + str(new_mana)

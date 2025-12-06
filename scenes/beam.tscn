@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://cdbnxyqipp6te"]
+
+[ext_resource type="Script" uid="uid://bi5e8l5drlrb1" path="res://scripts/abilities/beam/beam.gd" id="1_beam"]
+
+[sub_resource type="Gradient" id="Gradient_beam"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 1, 1, 0, 0.6, 0.9, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_beam"]
+gradient = SubResource("Gradient_beam")
+height = 8
+fill_from = Vector2(0, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_beam"]
+properties/0/path = NodePath(".:modulate")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="beam" type="Sprite2D"]
+z_index = 5
+scale = Vector2(1.046875, 8)
+texture = SubResource("GradientTexture2D_beam")
+script = ExtResource("1_beam")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_beam")

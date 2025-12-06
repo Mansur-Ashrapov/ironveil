@@ -8,7 +8,11 @@ var players_to_hit: Array[PlayerBase]
 
 
 func _ready() -> void:
-	if not multiplayer.is_server(): return
+	if not multiplayer.is_server():
+		return
+	_setup_hit_timer()
+
+func _setup_hit_timer() -> void:
 	var hit_timer = Timer.new()
 	hit_timer.wait_time = hit_timer_cooldown
 	hit_timer.autostart = true

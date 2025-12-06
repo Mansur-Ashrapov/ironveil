@@ -47,11 +47,11 @@ func _create_host():
 	
 	if error == OK:
 		multiplayer.multiplayer_peer = multiplayer_peer
-		
 		if not OS.has_feature("dedicated_server"):
 			_add_player_to_game(1)
 	else:
-		print("error creating host: %s" % str(error))
+		push_error("Failed to create Steam host: %s" % _get_error_string(error))
+		# Можно добавить сигнал для уведомления UI об ошибке
 
 func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: int):
 	print("On lobby joined: %s" % response)
@@ -62,20 +62,23 @@ func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: in
 			print("Connecting client to socket...")
 			connect_socket(id)
 	else:
-		# Get the failure reason
-		var FAIL_REASON: String
-		match response:
-			2:  FAIL_REASON = "This lobby no longer exists."
-			3:  FAIL_REASON = "You don't have permission to join this lobby."
-			4:  FAIL_REASON = "The lobby is now full."
-			5:  FAIL_REASON = "Uh... something unexpected happened!"
-			6:  FAIL_REASON = "You are banned from this lobby."
-			7:  FAIL_REASON = "You cannot join due to having a limited account."
-			8:  FAIL_REASON = "This lobby is locked or disabled."
-			9:  FAIL_REASON = "This lobby is community locked."
-			10: FAIL_REASON = "A user in the lobby has blocked you from joining."
-			11: FAIL_REASON = "A user you have blocked is in the lobby."
-		print(FAIL_REASON)
+		var fail_reason = _get_lobby_join_failure_reason(response)
+		push_error("Failed to join lobby: %s" % fail_reason)
+		# Можно добавить сигнал для уведомления UI об ошибке
+
+func _get_lobby_join_failure_reason(response: int) -> String:
+	match response:
+		2:  return "This lobby no longer exists."
+		3:  return "You don't have permission to join this lobby."
+		4:  return "The lobby is now full."
+		5:  return "Something unexpected happened!"
+		6:  return "You are banned from this lobby."
+		7:  return "You cannot join due to having a limited account."
+		8:  return "This lobby is locked or disabled."
+		9:  return "This lobby is community locked."
+		10: return "A user in the lobby has blocked you from joining."
+		11: return "A user you have blocked is in the lobby."
+		_:  return "Unknown error (code: %d)" % response
 	
 func connect_socket(steam_id: int):
 	multiplayer_peer = SteamMultiplayerPeer.new()
@@ -84,7 +87,21 @@ func connect_socket(steam_id: int):
 		print("Connecting peer to host...")
 		multiplayer.multiplayer_peer = multiplayer_peer
 	else:
-		print("Error creating client: %s" % str(error))
+		push_error("Failed to create Steam client: %s" % _get_error_string(error))
+		# Можно добавить сигнал для уведомления UI об ошибке
+
+func _get_error_string(error_code: int) -> String:
+	match error_code:
+		ERR_UNAVAILABLE:
+			return "Service unavailable"
+		ERR_UNCONFIGURED:
+			return "Unconfigured"
+		ERR_UNAUTHORIZED:
+			return "Unauthorized"
+		ERR_PARAMETER_RANGE_ERROR:
+			return "Parameter range error"
+		_:
+			return "Unknown error (code: %d)" % error_code
 
 func list_lobbies():
 	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)

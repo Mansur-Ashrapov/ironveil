@@ -1,6 +1,9 @@
 extends Sprite2D
 class_name Fireball
 
+const MAX_LIFETIME: float = 10.0
+const EXPLOSION_ANIMATION_DURATION: float = 0.3
+
 var damage: float = 0
 var direction: Vector2 = Vector2(1, 1)
 
@@ -19,11 +22,16 @@ func _ready() -> void:
 	if not multiplayer.is_server():
 		return
 
+	_setup_area_connections()
+	_start_lifetime_timer()
+
+func _setup_area_connections() -> void:
 	$Area2D.body_entered.connect(_on_body_entered)
 	$Area2D.area_entered.connect(_on_area_2d_area_entered)
-	
+
+func _start_lifetime_timer() -> void:
 	# Запускаем таймер на уничтожение, если не столкнётся
-	await get_tree().create_timer(10).timeout
+	await get_tree().create_timer(MAX_LIFETIME).timeout
 	sync_explosion.rpc()
 
 func get_ready(_damage: float):
@@ -72,7 +80,7 @@ func _update_target() -> void:
 @rpc("any_peer", "call_local", "reliable")
 func sync_explosion():
 	$AnimationPlayer.explosion()
-	await get_tree().create_timer(0.3).timeout
+	await get_tree().create_timer(EXPLOSION_ANIMATION_DURATION).timeout
 	queue_free()
 
 func explode():

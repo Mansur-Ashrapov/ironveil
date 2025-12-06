@@ -8,16 +8,13 @@ func _init() -> void:
 	stamina_cost = 5
 	mana_cost = 20
 
+const FIREBALL_OFFSET_DISTANCE: float = 50.0
+
 func _on_use(user: PlayerBase):
 	var fireball: Fireball = fireball_scene.instantiate()
 	fireball.get_ready(user.base_damage)
 	user.get_tree().get_first_node_in_group("trash").add_child(fireball)
-	if user.direction != Vector2.ZERO:
-		fireball.direction = user.direction
-		fireball.global_position = user.global_position + user.direction * Vector2(50.0, 50.0)
-	elif user.sprite.flip_h:
-		fireball.direction = Vector2.LEFT
-		fireball.global_position = user.global_position + Vector2.RIGHT * Vector2(50.0, 50.0)
-	else:
-		fireball.direction = Vector2.RIGHT
-		fireball.global_position = user.global_position + Vector2.LEFT * Vector2(50.0, 50.0)
+	
+	var ability_data = user.get_ability_direction_and_position(FIREBALL_OFFSET_DISTANCE)
+	fireball.direction = ability_data.direction
+	fireball.global_position = ability_data.position
