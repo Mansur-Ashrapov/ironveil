@@ -11,25 +11,25 @@ class_name SoundManagerClass
 # Словарь звуков: ключ -> путь к аудиофайлу
 var sounds: Dictionary = {
 	# Звуки игрока
-	"player_hurt": "res://sounds/player_hurt.wav",          # Игрок получает урон
-	"player_death": "res://sounds/player_death.wav",         # Смерть игрока
-	"player_level_up": "res://sounds/player_level_up.wav",      # Повышение уровня
+	"player_hurt": "res://assets/sounds/player_hurt.wav",          # Игрок получает урон
+	"player_death": "res://assets/sounds/player_death.wav",         # Смерть игрока
+	"player_level_up": "res://assets/sounds/player_level_up.wav",      # Повышение уровня
 	"player_footstep": "",      # Шаги
 	
 	# Звуки способностей
-	"ability_sword": "",        # Удар мечом
-	"ability_beam": "res://sounds/abbility_beam.wav",         # Луч
-	"ability_fireball": "res://sounds/ability_fireball.wav",     # Огненный шар
-	"ability_taunt": "res://sounds/ability_taunt.wav",        # Провокация
+	"ability_sword": "res://assets/sounds/ability_sword1.mp3",        # Удар мечом
+	"ability_beam": "res://assets/sounds/abbility_beam.wav",         # Луч
+	"ability_fireball": "res://assets/sounds/ability_fireball.wav",     # Огненный шар
+	"ability_taunt": "res://assets/sounds/ability_taunt.wav",        # Провокация
 	
 	# Звуки мобов
-	"mob_hurt": "res://sounds/mob_hurt.wav",             # Моб получает урон
-	"mob_death": "res://sounds/mob_death.wav",            # Смерть моба
+	"mob_hurt": "res://assets/sounds/mob_hurt.wav",             # Моб получает урон
+	"mob_death": "res://assets/sounds/mob_death.wav",            # Смерть моба
 	"mob_attack": "",           # Атака моба
 	
 	# UI звуки
-	"ui_click": "res://sounds/ui_click.wav",             # Клик по UI
-	"ui_upgrade": "res://sounds/ui_upgrade.wav",           # Улучшение навыка
+	"ui_click": "res://assets/sounds/ui_click.wav",             # Клик по UI
+	"ui_upgrade": "res://assets/sounds/ui_upgrade.wav",           # Улучшение навыка
 }
 
 # Количество одновременных AudioStreamPlayer для полифонии
@@ -40,8 +40,8 @@ var current_player_index_2d: int = 0
 var current_player_index: int = 0
 
 # Громкости по категориям (можно настроить в меню)
-var master_volume: float = 0.01
-var sfx_volume: float = 1.0
+var master_volume: float = 0.1
+var sfx_volume: float = 0.5
 var music_volume: float = 1.0
 
 # Кэш загруженных аудиопотоков

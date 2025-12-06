@@ -12,6 +12,7 @@ var _players_spawn_node
 var player_characters: Dictionary = {}  # {peer_id: character_type}
 var player_ready_status: Dictionary = {}  # {peer_id: bool}
 var connected_peers: Array = []  # List of connected peer IDs
+var is_solo_mode: bool = false
 
 signal player_created()
 signal character_selected(peer_id: int, character: String)
@@ -20,8 +21,9 @@ signal all_players_ready()
 signal player_joined_lobby(peer_id: int)
 signal player_left_lobby(peer_id: int)
 
-func become_host(max_players: int):
+func become_host(max_players: int, solo_mode: bool = false):
 	print("Starting host!")
+	is_solo_mode = solo_mode
 
 	multiplayer_peer = ENetMultiplayerPeer.new()
 	multiplayer_peer.create_server(SERVER_PORT, max_players)
@@ -118,7 +120,9 @@ func _broadcast_player_ready(peer_id: int, is_ready: bool):
 	player_ready_changed.emit(peer_id, is_ready)
 
 func _check_all_ready():
-	if connected_peers.size() < 2:
+	# В соло-режиме достаточно 1 игрока, в мультиплеере нужно минимум 2
+	var min_players = 1 if is_solo_mode else 2
+	if connected_peers.size() < min_players:
 		return
 	
 	for peer_id in connected_peers:

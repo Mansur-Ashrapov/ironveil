@@ -13,6 +13,7 @@ const LOBBY_MODE = "CoOP"
 var player_characters: Dictionary = {}  # {peer_id: character_type}
 var player_ready_status: Dictionary = {}  # {peer_id: bool}
 var connected_peers: Array = []  # List of connected peer IDs
+var is_solo_mode: bool = false
 
 signal player_created()
 signal character_selected(peer_id: int, character: String)
@@ -21,25 +22,37 @@ signal all_players_ready()
 signal player_joined_lobby(peer_id: int)
 signal player_left_lobby(peer_id: int)
 
-func  _ready():
-	Steam.lobby_created.connect(_on_lobby_created.bind())
+var _lobby_joined_connected: bool = false
+var _lobby_created_connected: bool = false
 
-func become_host(max_players: int):
+func  _ready():
+	if not _lobby_created_connected:
+		Steam.lobby_created.connect(_on_lobby_created.bind())
+		_lobby_created_connected = true
+
+func become_host(max_players: int, solo_mode: bool = false):
 	print("Starting host!")
+	is_solo_mode = solo_mode
 	
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	if not multiplayer.peer_connected.is_connected(_on_peer_connected):
+		multiplayer.peer_connected.connect(_on_peer_connected)
+	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	
-	Steam.lobby_joined.connect(_on_lobby_joined.bind())
+	if not _lobby_joined_connected:
+		Steam.lobby_joined.connect(_on_lobby_joined.bind())
+		_lobby_joined_connected = true
 	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 	
 func join_as_client(lobby_id):
 	print("Joining lobby %s" % lobby_id)
-	Steam.lobby_joined.connect(_on_lobby_joined.bind())
+	if not _lobby_joined_connected:
+		Steam.lobby_joined.connect(_on_lobby_joined.bind())
+		_lobby_joined_connected = true
 	Steam.joinLobby(int(lobby_id))
  
 func _on_lobby_created(_connect: int, lobby_id):
-	print("On lobby created")
+	print("On lobby created: connect=%s, lobby_id=%s" % [_connect, lobby_id])
 	if _connect == 1:
 		_hosted_lobby_id = lobby_id
 		print("Created lobby: %s" % _hosted_lobby_id)
@@ -50,6 +63,10 @@ func _on_lobby_created(_connect: int, lobby_id):
 		Steam.setLobbyData(_hosted_lobby_id, "mode", LOBBY_MODE)
 		
 		_create_host()
+	else:
+		var error_msg = "Failed to create lobby (error code: %d)" % _connect
+		push_error(error_msg)
+		print(error_msg)
 
 func _create_host():
 	print("Create Host")
@@ -65,13 +82,20 @@ func _create_host():
 		# Можно добавить сигнал для уведомления UI об ошибке
 
 func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: int):
-	print("On lobby joined: %s" % response)
+	print("On lobby joined: lobby=%s, response=%s" % [lobby, response])
 	
 	if response == 1:
-		var id = Steam.getLobbyOwner(lobby)
-		if id != Steam.getSteamID():
+		var lobby_owner_id = Steam.getLobbyOwner(lobby)
+		var my_steam_id = Steam.getSteamID()
+		
+		if lobby_owner_id == my_steam_id:
+			# We are the host - lobby was created, host is already set up in _create_host()
+			print("Joined own lobby as host")
+			# Host is already connected as peer 1 in _create_host()
+		else:
+			# We are a client - connect to the host
 			print("Connecting client to socket...")
-			connect_socket(id)
+			connect_socket(lobby_owner_id)
 	else:
 		var fail_reason = _get_lobby_join_failure_reason(response)
 		push_error("Failed to join lobby: %s" % fail_reason)
@@ -198,7 +222,9 @@ func _broadcast_player_ready(peer_id: int, is_ready: bool):
 	player_ready_changed.emit(peer_id, is_ready)
 
 func _check_all_ready():
-	if connected_peers.size() < 2:
+	# В соло-режиме достаточно 1 игрока, в мультиплеере нужно минимум 2
+	var min_players = 1 if is_solo_mode else 2
+	if connected_peers.size() < min_players:
 		return
 	
 	for peer_id in connected_peers:

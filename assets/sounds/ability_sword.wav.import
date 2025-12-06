@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b6fvlwte00oxj"
-path="res://.godot/imported/ability_sword.wav-a436ae75de095040a1ab1357b870a528.sample"
+path="res://.godot/imported/ability_sword.wav-c50536e17cdf9a13bff86295a5c5386d.sample"
 
 [deps]
 
-source_file="res://sounds/ability_sword.wav"
-dest_files=["res://.godot/imported/ability_sword.wav-a436ae75de095040a1ab1357b870a528.sample"]
+source_file="res://assets/sounds/ability_sword.wav"
+dest_files=["res://.godot/imported/ability_sword.wav-c50536e17cdf9a13bff86295a5c5386d.sample"]
 
 [params]
 

@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://cpl5pal3xdvto"
-path="res://.godot/imported/mob_attack.wav-5a3cea63e6983c25f2e27cdcff230f3f.sample"
+uid="uid://cq5shm17ttf4a"
+path="res://.godot/imported/ui_upgrade.wav-fedf988da2ac55a4efc4287b67a4e311.sample"
 
 [deps]
 
-source_file="res://sounds/mob_attack.wav"
-dest_files=["res://.godot/imported/mob_attack.wav-5a3cea63e6983c25f2e27cdcff230f3f.sample"]
+source_file="res://assets/sounds/ui_upgrade.wav"
+dest_files=["res://.godot/imported/ui_upgrade.wav-fedf988da2ac55a4efc4287b67a4e311.sample"]
 
 [params]
 

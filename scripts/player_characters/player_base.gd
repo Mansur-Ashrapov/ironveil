@@ -341,9 +341,8 @@ func _on_death():
 		# На клиенте просто устанавливаем состояние (таймер запустится через RPC)
 		set_dead_state.rpc(true)
 	
-	# Звук смерти только для владельца
-	if is_multiplayer_authority():
-		SoundManager.play_sound("player_death", global_position)
+	# Синхронизируем звук смерти на всех клиентах
+	_sync_sound.rpc("player_death")
 
 # Синхронизация состояния смерти
 @rpc("any_peer", "reliable", "call_local")

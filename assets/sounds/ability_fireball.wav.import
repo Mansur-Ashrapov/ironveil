@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d0ewry5cbtdfk"
-path="res://.godot/imported/ability_fireball.wav-6ad53443888ca2b58eff287b52a8b805.sample"
+path="res://.godot/imported/ability_fireball.wav-2e54a79329e2ed9cfdc23e5ae737f1eb.sample"
 
 [deps]
 
-source_file="res://sounds/ability_fireball.wav"
-dest_files=["res://.godot/imported/ability_fireball.wav-6ad53443888ca2b58eff287b52a8b805.sample"]
+source_file="res://assets/sounds/ability_fireball.wav"
+dest_files=["res://.godot/imported/ability_fireball.wav-2e54a79329e2ed9cfdc23e5ae737f1eb.sample"]
 
 [params]
 

@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://b6yunntkq3q7r"
-path="res://.godot/imported/ability_taunt.wav-f59bed79ed7eef0ff63b6c05d3e8c38b.sample"
+path="res://.godot/imported/ability_taunt.wav-8f1b858f5198f2f2dc70088b7906ff27.sample"
 
 [deps]
 
-source_file="res://sounds/ability_taunt.wav"
-dest_files=["res://.godot/imported/ability_taunt.wav-f59bed79ed7eef0ff63b6c05d3e8c38b.sample"]
+source_file="res://assets/sounds/ability_taunt.wav"
+dest_files=["res://.godot/imported/ability_taunt.wav-8f1b858f5198f2f2dc70088b7906ff27.sample"]
 
 [params]
 

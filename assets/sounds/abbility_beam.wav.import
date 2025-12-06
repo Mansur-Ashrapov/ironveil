@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bc8e6utok5s3a"
-path="res://.godot/imported/abbility_beam.wav-07e77d7f4268b896a23fcad700b9f673.sample"
+path="res://.godot/imported/abbility_beam.wav-a84cee97b46daaa610ae580c1470e8b4.sample"
 
 [deps]
 
-source_file="res://sounds/abbility_beam.wav"
-dest_files=["res://.godot/imported/abbility_beam.wav-07e77d7f4268b896a23fcad700b9f673.sample"]
+source_file="res://assets/sounds/abbility_beam.wav"
+dest_files=["res://.godot/imported/abbility_beam.wav-a84cee97b46daaa610ae580c1470e8b4.sample"]
 
 [params]
 

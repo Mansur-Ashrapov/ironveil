@@ -4,6 +4,7 @@ var is_owned: bool = false
 var steam_app_id: int = 480 # Test game app id
 var steam_id: int = 0
 var steam_username: String = ""
+var is_steam_initialized: bool = false
 
 var lobby_id = 0
 var lobby_max_members = 2
@@ -14,7 +15,8 @@ func _init():
 	OS.set_environment("SteamGameId", str(steam_app_id))
 
 func _process(_delta):
-	Steam.run_callbacks()
+	if is_steam_initialized:
+		Steam.run_callbacks()
 	
 func initialize_steam():
 	var initialize_response: Dictionary = Steam.steamInitEx()
@@ -23,7 +25,9 @@ func initialize_steam():
 	if initialize_response['status'] > 0:
 		print("Failed to init Steam! Shutting down. %s" % initialize_response)
 		get_tree().quit()
-		
+		return
+	
+	is_steam_initialized = true
 	is_owned = Steam.isSubscribed()
 	steam_id = Steam.getSteamID()
 	steam_username = Steam.getPersonaName()

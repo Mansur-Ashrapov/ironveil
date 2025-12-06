@@ -59,7 +59,8 @@ text = "УР:"
 label_settings = SubResource("LabelSettings_guxnq")
 
 [node name="RespawnTimerLabel" type="Label" parent="."]
-layout_mode = 3
+visible = false
+z_index = 10
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -71,12 +72,10 @@ offset_right = 150.0
 offset_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2
-z_index = 10
 theme_override_font_sizes/font_size = 48
 text = "Возрождение через: 5"
 horizontal_alignment = 1
 vertical_alignment = 1
-visible = false
 
 [node name="AbilityUpgradeUI" type="Control" parent="." node_paths=PackedStringArray("abilities_container", "title_label")]
 layout_mode = 3

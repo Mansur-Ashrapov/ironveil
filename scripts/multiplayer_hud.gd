@@ -3,6 +3,7 @@ extends Node
 var score = 0
 var selected_character: String = ""
 var is_host_mode: bool = false
+var is_solo_mode: bool = false
 var pending_lobby_id = 0
 var _spawned_players_count: int = 0
 var _expected_players_count: int = 0
@@ -76,12 +77,15 @@ func join_as_client():
 func play_solo():
 	SoundManager.play_sound("ui_click")
 	print("play_solo pressed")
+	is_solo_mode = true
+	is_host_mode = true
 	%MultiplayerHUD.hide()
 	%SteamHUD.hide()
-	%NetworkManager.become_host()
-	%GameManager.start_game(true)
-	#_show_waiting_players()
-	$CanvasLayer/Label.hide()
+	%CharacterSelectHUD.show()
+	
+	# Create network and host in solo mode
+	%NetworkManager.become_host(false, true)
+	_connect_network_signals()
 	_show_restart_button("MENU")
 
 # Character selection functions
@@ -174,8 +178,11 @@ func _on_all_players_ready():
 	%CharacterSelectHUD.hide()
 	$CanvasLayer/Label.hide()
 	
-	# Ожидаем max_players игроков
-	_expected_players_count = %NetworkManager.max_players
+	# В соло-режиме ожидаем только 1 игрока
+	if is_solo_mode:
+		_expected_players_count = 1
+	else:
+		_expected_players_count = %NetworkManager.max_players
 	_spawned_players_count = 0
 	_waiting_for_spawn = true
 	
@@ -209,13 +216,17 @@ func _on_player_left_lobby(_peer_id: int):
 	_update_players_list()
 
 
+var _lobby_match_list_connected: bool = false
+
 func use_steam():
 	SoundManager.play_sound("ui_click")
 	print("Using Steam!")
 	%MultiplayerHUD.hide()
 	%SteamHUD.show()
 	SteamManager.initialize_steam()
-	Steam.lobby_match_list.connect(_on_lobby_match_list)
+	if not _lobby_match_list_connected:
+		Steam.lobby_match_list.connect(_on_lobby_match_list)
+		_lobby_match_list_connected = true
 	%NetworkManager.active_network_type = %NetworkManager.MULTIPLAYER_NETWORK_TYPE.STEAM
 
 func list_steam_lobbies():

@@ -33,10 +33,10 @@ func _set_active_network(active_network_scene):
 	active_network._players_spawn_node = players_spawn_node
 	add_child(active_network)
 
-func become_host(is_dedicated_server = false):
+func become_host(is_dedicated_server = false, is_solo = false):
 	_build_multiplayer_network()
 	MultiplayerManager.host_mode_enabled = true if is_dedicated_server == false else false
-	active_network.become_host(max_players)
+	active_network.become_host(max_players, is_solo)
 	multiplayer.peer_disconnected.connect(reload_scene_on_disconnect)
 
 func join_as_client(lobby_id = 0):

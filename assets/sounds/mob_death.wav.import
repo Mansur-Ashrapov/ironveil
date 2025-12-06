@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://i5jr88p0jajc"
-path="res://.godot/imported/ui_click.wav-642c6cf18938bdd55f706d23c2d4c47b.sample"
+uid="uid://ceqcywmxxaju"
+path="res://.godot/imported/mob_death.wav-b2a2aab479a7fd5f378e9b601b6ea557.sample"
 
 [deps]
 
-source_file="res://sounds/ui_click.wav"
-dest_files=["res://.godot/imported/ui_click.wav-642c6cf18938bdd55f706d23c2d4c47b.sample"]
+source_file="res://assets/sounds/mob_death.wav"
+dest_files=["res://.godot/imported/mob_death.wav-b2a2aab479a7fd5f378e9b601b6ea557.sample"]
 
 [params]
 
