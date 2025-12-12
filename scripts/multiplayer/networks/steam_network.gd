@@ -5,6 +5,7 @@ var magician_scene = preload("res://scenes/magician.tscn")
 var multiplayer_peer: SteamMultiplayerPeer = SteamMultiplayerPeer.new()
 var _players_spawn_node
 var _hosted_lobby_id = 0
+var _current_lobby_id: int = 0
 
 const LOBBY_NAME = "IRONVEIL"
 const LOBBY_MODE = "CoOP"
@@ -14,6 +15,11 @@ var player_characters: Dictionary = {}  # {peer_id: character_type}
 var player_ready_status: Dictionary = {}  # {peer_id: bool}
 var connected_peers: Array = []  # List of connected peer IDs
 var is_solo_mode: bool = false
+
+# Steam player info
+var lobby_members: Dictionary = {}  # {steam_id: player_name}
+var steam_to_peer: Dictionary = {}  # {steam_id: peer_id}
+var peer_to_steam: Dictionary = {}  # {peer_id: steam_id}
 
 signal player_created()
 signal character_selected(peer_id: int, character: String)
@@ -25,22 +31,24 @@ signal client_connected_to_server()
 signal connection_failed(reason: String)
 
 
-func  _ready():
+func _ready():
 	Steam.connect("lobby_created", _on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_joined)
+	Steam.lobby_chat_update.connect(_on_lobby_chat_update)
 
 func become_host(max_players: int, solo_mode: bool = false):
 	print("Starting host!")
 	is_solo_mode = solo_mode
 	
-	if not multiplayer.peer_connected.is_connected(_on_peer_connected):
-		multiplayer.peer_connected.connect(_on_peer_connected)
-	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
-		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	
 	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 	
 func join_as_client(lobby_id):
+	# Connect signals for client connection handling
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	multiplayer.connection_failed.connect(_on_connection_failed)
 	print("Joining lobby %s" % lobby_id)
 	Steam.joinLobby(int(lobby_id))
  
@@ -48,14 +56,25 @@ func _on_lobby_created(_connect: int, lobby_id):
 	print("On lobby created: connect=%s, lobby_id=%s" % [_connect, lobby_id])
 	if _connect == Steam.RESULT_OK:
 		_hosted_lobby_id = lobby_id
+		_current_lobby_id = lobby_id
 		print("Created lobby: %s" % _hosted_lobby_id)
 		
 		multiplayer_peer.host_with_lobby(lobby_id)
 		multiplayer.multiplayer_peer = multiplayer_peer
+		
 		Steam.setLobbyJoinable(_hosted_lobby_id, true)
 		
 		Steam.setLobbyData(_hosted_lobby_id, "name", LOBBY_NAME)
 		Steam.setLobbyData(_hosted_lobby_id, "mode", LOBBY_MODE)
+		Steam.setLobbyData(_hosted_lobby_id, "game_id", "IRONVEIL")
+		
+		# Add host to lobby members and create steam<->peer mapping
+		var my_steam_id = Steam.getSteamID()
+		var my_name = Steam.getFriendPersonaName(my_steam_id)
+		lobby_members[my_steam_id] = my_name
+		steam_to_peer[my_steam_id] = 1
+		peer_to_steam[1] = my_steam_id
+		print("Host added to lobby: %s (%s) -> peer 1" % [my_name, my_steam_id])
 		
 		# Register host as connected peer
 		_on_peer_connected(1)
@@ -69,23 +88,95 @@ func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: in
 	print("On lobby joined: lobby=%s, response=%s" % [lobby, response])
 	
 	if response == 1:
+		_current_lobby_id = lobby
 		var lobby_owner_id = Steam.getLobbyOwner(lobby)
 		var my_steam_id = Steam.getSteamID()
+		
+		# Refresh lobby members list from Steam
+		_refresh_lobby_members()
 		
 		if lobby_owner_id == my_steam_id:
 			# We are the host - lobby was created, host is already set up in _create_host()
 			print("Joined own lobby as host")
 			# Host is already connected as peer 1 in _create_host()
 		else:
-			# Connect signal for client to know when connected to server
-			if not multiplayer.connected_to_server.is_connected(_on_connected_to_server):
-				multiplayer.connected_to_server.connect(_on_connected_to_server)
-			multiplayer_peer.connect_to_lobby(lobby)
+			# Connect to lobby P2P and check result
+			print("Connecting to lobby P2P...")
+			var error = multiplayer_peer.connect_to_lobby(lobby)
+			if error != OK:
+				var error_msg = "Failed to connect to lobby P2P: %s" % _get_error_string(error)
+				push_error(error_msg)
+				connection_failed.emit(error_msg)
+				return
+			
+			# Set multiplayer peer after successful connect_to_lobby call
 			multiplayer.multiplayer_peer = multiplayer_peer
+			print("Multiplayer peer set, waiting for P2P connection...")
+			
+			# Wait for peer to be connected
+			await _wait_for_connection()
+			_on_connected_to_server()
+
 	else:
 		var fail_reason = _get_lobby_join_failure_reason(response)
 		push_error("Failed to join lobby: %s" % fail_reason)
 		connection_failed.emit(fail_reason)
+
+func _wait_for_connection():
+	print("Waiting for peer connection...")
+	var timeout = 30.0  # 20 seconds timeout
+	var elapsed = 0.0
+	
+
+	while multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		print_debug(multiplayer.multiplayer_peer.get_connection_status())
+		if elapsed >= timeout:
+			push_error("Connection timeout!")
+			connection_failed.emit("Connection timeout - could not connect to host")
+			return
+		await get_tree().create_timer(0.1).timeout
+		elapsed += 0.1
+	
+	print("Peer connected!")
+
+func _on_lobby_chat_update(lobby_id: int, changed_id: int, making_change_id: int, chat_state: int):
+	print("Lobby chat update: lobby=%s, changed=%s, maker=%s, state=%s" % [lobby_id, changed_id, making_change_id, chat_state])
+	
+	if lobby_id != _current_lobby_id:
+		return
+	
+	# Chat states: 1 = Entered, 2 = Left, 4 = Disconnected, 8 = Kicked, 16 = Banned
+	match chat_state:
+		1:  # Player entered
+			var player_name = Steam.getFriendPersonaName(changed_id)
+			lobby_members[changed_id] = player_name
+			print("Player entered lobby: %s (%s)" % [player_name, changed_id])
+			player_joined_lobby.emit(changed_id)
+		2, 4, 8, 16:  # Player left/disconnected/kicked/banned
+			if lobby_members.has(changed_id):
+				var player_name = lobby_members[changed_id]
+				lobby_members.erase(changed_id)
+				print("Player left lobby: %s (%s)" % [player_name, changed_id])
+				player_left_lobby.emit(changed_id)
+
+func _refresh_lobby_members():
+	lobby_members.clear()
+	
+	if _current_lobby_id == 0:
+		return
+	
+	var num_members = Steam.getNumLobbyMembers(_current_lobby_id)
+	print("Refreshing lobby members: %d members" % num_members)
+	
+	for i in range(num_members):
+		var steam_id = Steam.getLobbyMemberByIndex(_current_lobby_id, i)
+		var player_name = Steam.getFriendPersonaName(steam_id)
+		lobby_members[steam_id] = player_name
+		print("  - %s (%s)" % [player_name, steam_id])
+
+func _on_connection_failed():
+	print("P2P connection failed!")
+	connection_failed.emit("Failed to establish P2P connection with host")
 
 func _get_lobby_join_failure_reason(response: int) -> String:
 	match response:
@@ -104,11 +195,37 @@ func _get_lobby_join_failure_reason(response: int) -> String:
 
 func _on_connected_to_server():
 	var my_id = multiplayer.get_unique_id()
-	print("Connected to server as peer %s" % my_id)
+	var my_steam_id = Steam.getSteamID()
+	print("Connected to server as peer %s (steam: %s)" % [my_id, my_steam_id])
+	
+	# Create steam<->peer mapping for client
+	steam_to_peer[my_steam_id] = my_id
+	peer_to_steam[my_id] = my_steam_id
+	
 	connected_peers.append(my_id)
 	player_ready_status[my_id] = false
 	player_joined_lobby.emit(my_id)
 	client_connected_to_server.emit()
+	
+	# Send steam_id to server for mapping
+	_register_steam_id.rpc_id(1, my_steam_id)
+
+@rpc("any_peer", "reliable")
+func _register_steam_id(steam_id: int):
+	var sender_id = multiplayer.get_remote_sender_id()
+	print("Registering steam_id %s for peer %s" % [steam_id, sender_id])
+	
+	steam_to_peer[steam_id] = sender_id
+	peer_to_steam[sender_id] = steam_id
+	
+	# Broadcast mapping to all clients
+	_broadcast_steam_mapping.rpc(sender_id, steam_id)
+
+@rpc("authority", "reliable", "call_local")
+func _broadcast_steam_mapping(peer_id: int, steam_id: int):
+	print("Received steam mapping: peer %s = steam %s" % [peer_id, steam_id])
+	steam_to_peer[steam_id] = peer_id
+	peer_to_steam[peer_id] = steam_id
 
 func _get_error_string(error_code: int) -> String:
 	match error_code:
@@ -124,7 +241,7 @@ func _get_error_string(error_code: int) -> String:
 			return "Unknown error (code: %d)" % error_code
 
 func list_lobbies():
-	Steam.addRequestLobbyListStringFilter("name", LOBBY_NAME, Steam.LOBBY_COMPARISON_EQUAL)
+	Steam.addRequestLobbyListStringFilter("game_id", "IRONVEIL", Steam.LOBBY_COMPARISON_EQUAL)
 	Steam.requestLobbyList()
 
 func _on_peer_connected(id: int):
@@ -133,27 +250,41 @@ func _on_peer_connected(id: int):
 	player_ready_status[id] = false
 	player_joined_lobby.emit(id)
 	
-	# Sync existing players to the new peer
+	# Sync existing players to the new peer (including steam mappings)
 	if multiplayer.is_server() and id != 1:
 		for peer_id in connected_peers:
 			if peer_id != id:
-				_sync_player_to_peer.rpc_id(id, peer_id, player_characters.get(peer_id, ""), player_ready_status.get(peer_id, false))
+				var steam_id = peer_to_steam.get(peer_id, 0)
+				_sync_player_to_peer.rpc_id(id, peer_id, steam_id, player_characters.get(peer_id, ""), player_ready_status.get(peer_id, false))
 
 func _on_peer_disconnected(id: int):
 	print("Peer %s disconnected from lobby!" % id)
 	connected_peers.erase(id)
 	player_characters.erase(id)
 	player_ready_status.erase(id)
+	
+	# Clean up steam mapping
+	var steam_id = peer_to_steam.get(id, 0)
+	if steam_id > 0:
+		steam_to_peer.erase(steam_id)
+		peer_to_steam.erase(id)
+	
 	player_left_lobby.emit(id)
 	_del_player(id)
 
 @rpc("any_peer", "reliable", "call_local")
-func _sync_player_to_peer(peer_id: int, character: String, is_ready: bool):
+func _sync_player_to_peer(peer_id: int, steam_id: int, character: String, is_ready: bool):
 	if peer_id not in connected_peers:
 		connected_peers.append(peer_id)
 	if character != "":
 		player_characters[peer_id] = character
 	player_ready_status[peer_id] = is_ready
+	
+	# Store steam mapping
+	if steam_id > 0:
+		steam_to_peer[steam_id] = peer_id
+		peer_to_steam[peer_id] = steam_id
+	
 	player_joined_lobby.emit(peer_id)
 	if character != "":
 		character_selected.emit(peer_id, character)
@@ -249,3 +380,37 @@ func get_player_character(peer_id: int) -> String:
 
 func get_player_ready(peer_id: int) -> bool:
 	return player_ready_status.get(peer_id, false)
+
+func get_lobby_members() -> Dictionary:
+	return lobby_members
+
+func get_player_name(steam_id: int) -> String:
+	if lobby_members.has(steam_id):
+		return lobby_members[steam_id]
+	return Steam.getFriendPersonaName(steam_id)
+
+func get_my_steam_id() -> int:
+	return Steam.getSteamID()
+
+func get_lobby_owner_steam_id() -> int:
+	if _current_lobby_id == 0:
+		return 0
+	return Steam.getLobbyOwner(_current_lobby_id)
+
+func get_peer_id_by_steam(steam_id: int) -> int:
+	return steam_to_peer.get(steam_id, 0)
+
+func get_steam_id_by_peer(peer_id: int) -> int:
+	return peer_to_steam.get(peer_id, 0)
+
+func get_player_character_by_steam(steam_id: int) -> String:
+	var peer_id = steam_to_peer.get(steam_id, 0)
+	if peer_id > 0:
+		return player_characters.get(peer_id, "")
+	return ""
+
+func get_player_ready_by_steam(steam_id: int) -> bool:
+	var peer_id = steam_to_peer.get(steam_id, 0)
+	if peer_id > 0:
+		return player_ready_status.get(peer_id, false)
+	return false

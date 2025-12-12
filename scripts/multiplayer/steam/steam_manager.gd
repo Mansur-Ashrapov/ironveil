@@ -15,8 +15,7 @@ func _init():
 	OS.set_environment("SteamGameId", str(steam_app_id))
 
 func _process(_delta):
-	if is_steam_initialized:
-		Steam.run_callbacks()
+	Steam.run_callbacks()
 	
 func initialize_steam():
 	var initialize_response: Dictionary = Steam.steamInitEx()

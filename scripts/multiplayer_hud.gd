@@ -111,7 +111,11 @@ func select_swordsman():
 	# Send choice to server
 	var network = %NetworkManager.active_network
 	if network:
-		network.register_character_choice.rpc_id(1, "swordsman")
+		if _is_peer_connected():
+			network.register_character_choice.rpc_id(1, "swordsman")
+		else:
+			# Direct call for host or when not yet connected
+			network.register_character_choice("swordsman")
 
 func select_magician():
 	SoundManager.play_sound("ui_click")
@@ -122,7 +126,11 @@ func select_magician():
 	# Send choice to server
 	var network = %NetworkManager.active_network
 	if network:
-		network.register_character_choice.rpc_id(1, "magician")
+		if _is_peer_connected():
+			network.register_character_choice.rpc_id(1, "magician")
+		else:
+			# Direct call for host or when not yet connected
+			network.register_character_choice("magician")
 
 func on_ready_pressed():
 	SoundManager.play_sound("ui_click")
@@ -132,7 +140,11 @@ func on_ready_pressed():
 	# Send ready status to server
 	var network = %NetworkManager.active_network
 	if network:
-		network.set_player_ready.rpc_id(1, true)
+		if _is_peer_connected():
+			network.set_player_ready.rpc_id(1, true)
+		else:
+			# Direct call for host or when not yet connected
+			network.set_player_ready(true)
 	
 	# Disable button after pressing
 	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn.disabled = true
@@ -141,6 +153,12 @@ func on_ready_pressed():
 	# Disable character buttons
 	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/SwordsmanBtn.disabled = true
 	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/MagicianBtn.disabled = true
+
+func _is_peer_connected() -> bool:
+	var peer = multiplayer.multiplayer_peer
+	if peer == null:
+		return false
+	return peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED
 
 func _update_selected_label():
 	var label = $CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/SelectedLabel
@@ -166,18 +184,42 @@ func _update_players_list():
 	if not network:
 		return
 	
-	for peer_id in network.get_connected_peers():
-		var player_label = Label.new()
-		var char_type = network.get_player_character(peer_id)
-		var is_ready = network.get_player_ready(peer_id)
+	# Check if using Steam network (has get_lobby_members method)
+	var is_steam = network.has_method("get_lobby_members")
+	
+	if is_steam:
+		# Use Steam lobby members for display
+		var lobby_members = network.get_lobby_members()
+		var owner_steam_id = network.get_lobby_owner_steam_id()
 		
-		var peer_name = "Host" if peer_id == 1 else "Player %s" % peer_id
-		var char_name = char_type if char_type != "" else "..."
-		var ready_text = " [Ready]" if is_ready else ""
-		
-		player_label.text = "%s: %s%s" % [peer_name, char_name, ready_text]
-		player_label.add_theme_font_size_override("font_size", 7)
-		players_container.add_child(player_label)
+		for steam_id in lobby_members:
+			var player_label = Label.new()
+			var player_name = lobby_members[steam_id]
+			var is_host = steam_id == owner_steam_id
+			var char_type = network.get_player_character_by_steam(steam_id)
+			var is_ready = network.get_player_ready_by_steam(steam_id)
+			
+			var char_name = char_type if char_type != "" else "..."
+			var ready_text = " [Ready]" if is_ready else ""
+			var host_text = " (Host)" if is_host else ""
+			
+			player_label.text = "%s%s: %s%s" % [player_name, host_text, char_name, ready_text]
+			player_label.add_theme_font_size_override("font_size", 7)
+			players_container.add_child(player_label)
+	else:
+		# Fallback to peer_id based display (for ENet)
+		for peer_id in network.get_connected_peers():
+			var player_label = Label.new()
+			var char_type = network.get_player_character(peer_id)
+			var is_ready = network.get_player_ready(peer_id)
+			
+			var peer_name = "Host" if peer_id == 1 else "Player %s" % peer_id
+			var char_name = char_type if char_type != "" else "..."
+			var ready_text = " [Ready]" if is_ready else ""
+			
+			player_label.text = "%s: %s%s" % [peer_name, char_name, ready_text]
+			player_label.add_theme_font_size_override("font_size", 7)
+			players_container.add_child(player_label)
 
 # Network signal handlers
 func _on_character_selected(_peer_id: int, _character: String):
