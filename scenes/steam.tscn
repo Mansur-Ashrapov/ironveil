@@ -288,7 +288,6 @@ position = Vector2(1534, -608)
 [node name="TRASH" type="Node2D" parent="." groups=["trash"]]
 
 [node name="map" parent="." instance=ExtResource("5_2dvlx")]
-position = Vector2(598, -50)
 
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="become_host"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="join_as_client"]
