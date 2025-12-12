@@ -39,7 +39,7 @@ func _ready():
 func become_host(max_players: int, solo_mode: bool = false):
 	print("Starting host!")
 	is_solo_mode = solo_mode
-	
+	multiplayer_peer = SteamMultiplayerPeer.new()
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	
@@ -47,6 +47,7 @@ func become_host(max_players: int, solo_mode: bool = false):
 	
 func join_as_client(lobby_id):
 	# Connect signals for client connection handling
+	multiplayer_peer = SteamMultiplayerPeer.new()
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
 	print("Joining lobby %s" % lobby_id)

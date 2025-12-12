@@ -1,8 +1,10 @@
 extends Node
 
 var is_game_started = false
+var is_victory = false
 
 signal game_started()
+signal victory()
 
 func get_all_players() -> Array[PlayerBase]:
 	var players: Array[PlayerBase] = []
@@ -39,3 +41,10 @@ func emit_game_started():
 	is_game_started = true
 	print("GAME_STARTED ", is_game_started)
 	game_started.emit()
+
+func on_boss_defeated():
+	if is_victory:
+		return
+	is_victory = true
+	print("VICTORY! Boss defeated!")
+	victory.emit()

@@ -25,6 +25,9 @@ enum BossPhase {
 @export var retreat_distance: float = 250.0
 @export var teleport_range: float = 600.0
 
+# Дистанция потери цели
+const LOSE_TARGET_DISTANCE: float = 600.0
+
 # Кулдауны для фаз (в секундах)
 const PHASE_1_ATTACK_COOLDOWN: float = 3.0
 const PHASE_2_ATTACK_COOLDOWN: float = 2.0
@@ -61,6 +64,7 @@ signal state_changed(new_state: BossState)
 signal phase_changed(new_phase: BossPhase)
 signal mark_placed(player: PlayerBase)
 signal special_attack_started()
+signal boss_defeated()
 
 
 func _ready() -> void:
@@ -125,6 +129,14 @@ func _process_state(delta: float) -> void:
 
 
 func _process_idle_state(_delta: float) -> void:
+	# Проверяем дистанцию до цели - теряем её если слишком далеко
+	if _has_valid_target():
+		var distance_to_target = global_position.distance_to(target_player.global_position)
+		if distance_to_target > LOSE_TARGET_DISTANCE:
+			print("[BOSS] Lost target - player too far: ", distance_to_target)
+			target_player = null
+			return
+	
 	# Проверяем, можем ли использовать специальную атаку
 	if special_cooldown_timer <= 0 and _has_valid_target():
 		_start_special_attack()
@@ -402,4 +414,20 @@ func _spawn_mark_effect(player_path: NodePath) -> void:
 func take_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO) -> void:
 	super.take_damage(amount, damage_source_position)
 	_update_phase()
+
+# Переопределяем смерть для сигнала победы
+@rpc("any_peer", "call_local", "reliable")
+func death():
+	boss_defeated.emit()
+	_notify_victory.rpc()
+	queue_free()
+
+@rpc("authority", "call_local", "reliable")
+func _notify_victory() -> void:
+	# Уведомляем GameManager о победе
+	var game_manager = get_tree().get_first_node_in_group("root")
+	if game_manager:
+		var gm = game_manager.get_node_or_null("%GameManager")
+		if gm and gm.has_method("on_boss_defeated"):
+			gm.on_boss_defeated()
 

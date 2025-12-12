@@ -1,11 +1,15 @@
-[gd_scene load_steps=11 format=3 uid="uid://cwgldckefibmk"]
+[gd_scene load_steps=14 format=3 uid="uid://cwgldckefibmk"]
 
 [ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
 [ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
 [ext_resource type="Script" uid="uid://ckq8iqqlp2qwm" path="res://scripts/multiplayer/networks/network_manager.gd" id="2_ofxfn"]
 [ext_resource type="Texture2D" uid="uid://c4rxm8scj221x" path="res://assets/sprites/Spritesheet_UI_Flat.png" id="3_5lcxu"]
-[ext_resource type="PackedScene" uid="uid://b4wlhb7ae0w0v" path="res://scenes/map.tscn" id="5_2dvlx"]
+[ext_resource type="PackedScene" uid="uid://d0821kv8sqbd5" path="res://scenes/map2.tscn" id="5_2dvlx"]
 [ext_resource type="PackedScene" uid="uid://mitha5btmbo1" path="res://scenes/boss.tscn" id="6_5lcxu"]
+[ext_resource type="PackedScene" uid="uid://cjubmbied2t6k" path="res://scenes/slime.tscn" id="7_b3d1v"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ndvyg"]
+font_size = 13
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_b3d1v"]
 atlas = ExtResource("3_5lcxu")
@@ -17,6 +21,9 @@ region = Rect2(32.016, 32.017, 96.124, 64)
 
 [sub_resource type="LabelSettings" id="LabelSettings_cc156"]
 font_size = 29
+
+[sub_resource type="LabelSettings" id="LabelSettings_b3d1v"]
+font_size = 8
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_5lcxu"]
 atlas = ExtResource("3_5lcxu")
@@ -33,6 +40,21 @@ unique_name_in_owner = true
 script = ExtResource("1_cw38t")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="HUD"]
+
+[node name="Label" type="Label" parent="HUD/CanvasLayer"]
+offset_left = 116.0
+offset_top = 387.0
+offset_right = 494.0
+offset_bottom = 592.0
+text = "WASD - двигаться
+SPACE - первая способность
+RMB - вторая способность
+
+Что бы подключиться через стим ->
+ Use Steam
+
+"
+label_settings = SubResource("LabelSettings_ndvyg")
 
 [node name="MultiplayerHUD" type="Control" parent="HUD/CanvasLayer"]
 unique_name_in_owner = true
@@ -219,17 +241,6 @@ offset_right = 178.0
 offset_bottom = 56.0
 text = "RESTART"
 
-[node name="Label" type="Label" parent="HUD/CanvasLayer"]
-offset_left = 550.0
-offset_top = 97.0
-offset_right = 712.0
-offset_bottom = 224.0
-text = "WASD - move
-SPACE - first ability
-RMB - second ability
-
-MOUSE AIM NOT WORKING"
-
 [node name="CharacterSelectHUD" type="Control" parent="HUD/CanvasLayer"]
 unique_name_in_owner = true
 visible = false
@@ -240,6 +251,20 @@ offset_top = 70.0
 offset_right = 300.0
 offset_bottom = 280.0
 scale = Vector2(2.5, 2.5)
+
+[node name="Label" type="Label" parent="HUD/CanvasLayer/CharacterSelectHUD"]
+layout_mode = 0
+offset_left = 243.6
+offset_top = 3.9999983
+offset_right = 621.6
+offset_bottom = 209.0
+text = "Swordsman - ближник, атакует мечем и 
+агрит мобов на себя, получая дополнительный
+резист к урону
+
+Magician - дальник, атакует фаерболом и 
+бластером"
+label_settings = SubResource("LabelSettings_b3d1v")
 
 [node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/CharacterSelectHUD"]
 layout_mode = 1
@@ -321,7 +346,7 @@ spawn_path = NodePath("../Players")
 spawn_limit = 10
 
 [node name="Players" type="Node2D" parent="."]
-position = Vector2(-993, -81)
+position = Vector2(1642, 364)
 
 [node name="TRASH" type="Node2D" parent="." groups=["trash"]]
 
@@ -330,9 +355,91 @@ _spawnable_scenes = PackedStringArray("uid://sroa8ntv1jk0")
 spawn_path = NodePath("../TRASH")
 
 [node name="map" parent="." instance=ExtResource("5_2dvlx")]
+position = Vector2(3459, 1291)
 
 [node name="Boss" parent="." instance=ExtResource("6_5lcxu")]
-position = Vector2(2208, 771)
+position = Vector2(7095, 1462)
+
+[node name="Slime" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(1479, 1956)
+
+[node name="Slime2" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(1670, 2031)
+
+[node name="Slime3" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(1730, 2158)
+
+[node name="Slime4" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(2323, 2158)
+
+[node name="Slime5" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(2514, 2233)
+
+[node name="Slime6" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(2574, 2360)
+
+[node name="Slime7" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(2374, 2016)
+
+[node name="Slime8" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(2565, 2091)
+
+[node name="Slime9" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(2625, 2218)
+
+[node name="Slime10" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3006, 729)
+
+[node name="Slime11" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3197, 804)
+
+[node name="Slime12" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3257, 931)
+
+[node name="Slime13" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3024, 434)
+
+[node name="Slime14" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3215, 509)
+
+[node name="Slime15" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3275, 636)
+
+[node name="Slime16" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3773, 2191)
+
+[node name="Slime17" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3964, 2266)
+
+[node name="Slime18" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4024, 2393)
+
+[node name="Slime19" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3791, 1896)
+
+[node name="Slime20" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(3982, 1971)
+
+[node name="Slime21" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4042, 2098)
+
+[node name="Slime22" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4524, 2191)
+
+[node name="Slime23" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4715, 2266)
+
+[node name="Slime24" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4775, 2393)
+
+[node name="Slime25" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4542, 1896)
+
+[node name="Slime26" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4733, 1971)
+
+[node name="Slime27" parent="." instance=ExtResource("7_b3d1v")]
+position = Vector2(4793, 2098)
 
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/HostGame" to="HUD" method="show_character_select_host"]
 [connection signal="pressed" from="HUD/CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/JoinAsClient" to="HUD" method="show_character_select_client"]

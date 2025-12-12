@@ -177,3 +177,24 @@ func get_player_character(peer_id: int) -> String:
 
 func get_player_ready(peer_id: int) -> bool:
 	return player_ready_status.get(peer_id, false)
+
+func leave_lobby():
+	# Отключаем сигналы
+	if multiplayer.peer_connected.is_connected(_on_peer_connected):
+		multiplayer.peer_connected.disconnect(_on_peer_connected)
+	if multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
+		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected)
+	if multiplayer.connected_to_server.is_connected(_on_connected_to_server):
+		multiplayer.connected_to_server.disconnect(_on_connected_to_server)
+	
+	# Закрываем и очищаем peer
+	if multiplayer_peer:
+		multiplayer_peer.close()
+		multiplayer_peer = null
+	multiplayer.multiplayer_peer = null
+	
+	# Очищаем состояние
+	player_characters.clear()
+	player_ready_status.clear()
+	connected_peers.clear()
+	is_solo_mode = false

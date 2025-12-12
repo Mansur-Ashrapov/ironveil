@@ -70,5 +70,8 @@ func leave_lobby():
 		active_network.queue_free()
 		active_network = null
 	
+	# Сбрасываем max_players к начальному значению
+	max_players = 2
+	
 	MultiplayerManager.host_mode_enabled = false
 	MultiplayerManager.multiplayer_mode_enabled = false

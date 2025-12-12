@@ -14,6 +14,7 @@ func _ready():
 		print("Starting dedicated server...")
 		%NetworkManager.become_host(true)
 	%GameManager.game_started.connect(_hide_waiting_on_game_started)
+	%GameManager.victory.connect(_on_victory)
 	
 	# Подключаем сигнал spawned от MultiplayerSpawner
 	var spawner = get_node_or_null("../MultiplayerSpawner")
@@ -405,3 +406,20 @@ func _reset_hud_state():
 	_spawned_players_count = 0
 	_expected_players_count = 0
 	_waiting_for_spawn = false
+
+func _on_victory():
+	print("Victory UI shown!")
+	$CanvasLayer/VictoryHUD.show()
+
+func _on_return_to_menu_pressed():
+	SoundManager.play_sound("ui_click")
+	$CanvasLayer/VictoryHUD.hide()
+	
+	# Корректно покидаем лобби через NetworkManager
+	%NetworkManager.leave_lobby()
+	
+	# Сбрасываем состояние HUD
+	_reset_hud_state()
+	
+	# Перезагружаем сцену
+	get_tree().reload_current_scene()
