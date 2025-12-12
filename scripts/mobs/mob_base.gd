@@ -34,9 +34,11 @@ signal moving_to_player()
 signal stop_moving()
 
 func _ready() -> void:
-	get_hit.connect(animation_controller.on_get_hit)
-	moving_to_player.connect(animation_controller.moving_to_player)
-	stop_moving.connect(animation_controller.stop_moving)
+	add_to_group("damageables")
+	
+	get_hit.connect(animation_cotroller.on_get_hit)
+	moving_to_player.connect(animation_cotroller.moving_to_player)
+	stop_moving.connect(animation_cotroller.stop_moving)
 
 func find_nearest_player() -> bool:
 	# Если есть принудительное агро, используем его
@@ -88,6 +90,9 @@ func take_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
 		await get_tree().create_timer(DEATH_DELAY).timeout
 		death.rpc()
 		
+
+func take_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
+	get_damage(amount, damage_source_position)
 
 func apply_knockback(damage_source_position: Vector2):
 	# Вычисляем направление от источника урона

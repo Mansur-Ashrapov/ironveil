@@ -330,7 +330,6 @@ _spawnable_scenes = PackedStringArray("uid://sroa8ntv1jk0")
 spawn_path = NodePath("../TRASH")
 
 [node name="map" parent="." instance=ExtResource("5_2dvlx")]
-position = Vector2(598, -50)
 
 [node name="Boss" parent="." instance=ExtResource("6_5lcxu")]
 position = Vector2(2208, 771)
