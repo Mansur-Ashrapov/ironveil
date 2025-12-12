@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cwgldckefibmk"]
+[gd_scene load_steps=11 format=3 uid="uid://cwgldckefibmk"]
 
 [ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
 [ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
@@ -10,6 +10,10 @@
 [sub_resource type="AtlasTexture" id="AtlasTexture_b3d1v"]
 atlas = ExtResource("3_5lcxu")
 region = Rect2(31.917051, 31.96077, 96.149216, 64.05053)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ndvyg"]
+atlas = ExtResource("3_5lcxu")
+region = Rect2(32.016, 32.017, 96.124, 64)
 
 [sub_resource type="LabelSettings" id="LabelSettings_cc156"]
 font_size = 29
@@ -94,19 +98,23 @@ scale = Vector2(3.6164927, 3.338871)
 
 [node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/SteamHUD"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_bottom = 20.0
+anchor_bottom = 1.2190001
+offset_bottom = -1.9000092
 grow_horizontal = 2
 grow_vertical = 2
+texture = SubResource("AtlasTexture_ndvyg")
 
 [node name="Options" type="VBoxContainer" parent="HUD/CanvasLayer/SteamHUD/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -80.0
+offset_left = 3.8711529
+offset_top = 7.188058
+offset_right = -3.8653946
+offset_bottom = -68.81194
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -125,8 +133,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 44.02686
-offset_bottom = 4.0268555
+offset_left = 3.8711529
+offset_top = 52.113422
+offset_right = -4.141899
+offset_bottom = -5.4447937
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(1, 0.9497084)
