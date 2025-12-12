@@ -34,6 +34,7 @@ func initialize_steam():
 
 	print("steam_id %s" % steam_id)
 	
+	
 	if is_owned == false:
 		print("User does not own game!")
 		get_tree().quit()

@@ -2,7 +2,7 @@ extends Node
 
 var swordsman_scene = preload("res://scenes/swords_man.tscn")
 var magician_scene = preload("res://scenes/magician.tscn")
-var multiplayer_peer: SteamMultiplayerPeer
+var multiplayer_peer: SteamMultiplayerPeer = SteamMultiplayerPeer.new()
 var _players_spawn_node
 var _hosted_lobby_id = 0
 
@@ -21,14 +21,13 @@ signal player_ready_changed(peer_id: int, is_ready: bool)
 signal all_players_ready()
 signal player_joined_lobby(peer_id: int)
 signal player_left_lobby(peer_id: int)
+signal client_connected_to_server()
+signal connection_failed(reason: String)
 
-var _lobby_joined_connected: bool = false
-var _lobby_created_connected: bool = false
 
 func  _ready():
-	if not _lobby_created_connected:
-		Steam.lobby_created.connect(_on_lobby_created.bind())
-		_lobby_created_connected = true
+	Steam.connect("lobby_created", _on_lobby_created)
+	Steam.lobby_joined.connect(_on_lobby_joined)
 
 func become_host(max_players: int, solo_mode: bool = false):
 	print("Starting host!")
@@ -39,47 +38,32 @@ func become_host(max_players: int, solo_mode: bool = false):
 	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
 		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	
-	if not _lobby_joined_connected:
-		Steam.lobby_joined.connect(_on_lobby_joined.bind())
-		_lobby_joined_connected = true
 	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, max_players)
 	
 func join_as_client(lobby_id):
 	print("Joining lobby %s" % lobby_id)
-	if not _lobby_joined_connected:
-		Steam.lobby_joined.connect(_on_lobby_joined.bind())
-		_lobby_joined_connected = true
 	Steam.joinLobby(int(lobby_id))
  
 func _on_lobby_created(_connect: int, lobby_id):
 	print("On lobby created: connect=%s, lobby_id=%s" % [_connect, lobby_id])
-	if _connect == 1:
+	if _connect == Steam.RESULT_OK:
 		_hosted_lobby_id = lobby_id
 		print("Created lobby: %s" % _hosted_lobby_id)
 		
+		multiplayer_peer.host_with_lobby(lobby_id)
+		multiplayer.multiplayer_peer = multiplayer_peer
 		Steam.setLobbyJoinable(_hosted_lobby_id, true)
 		
 		Steam.setLobbyData(_hosted_lobby_id, "name", LOBBY_NAME)
 		Steam.setLobbyData(_hosted_lobby_id, "mode", LOBBY_MODE)
 		
-		_create_host()
+		# Register host as connected peer
+		_on_peer_connected(1)
 	else:
 		var error_msg = "Failed to create lobby (error code: %d)" % _connect
 		push_error(error_msg)
 		print(error_msg)
 
-func _create_host():
-	print("Create Host")
-	multiplayer_peer = SteamMultiplayerPeer.new()
-	var error = multiplayer_peer.create_host(0)
-	
-	if error == OK:
-		multiplayer.multiplayer_peer = multiplayer_peer
-		if not OS.has_feature("dedicated_server"):
-			_on_peer_connected(1)
-	else:
-		push_error("Failed to create Steam host: %s" % _get_error_string(error))
-		# Можно добавить сигнал для уведомления UI об ошибке
 
 func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: int):
 	print("On lobby joined: lobby=%s, response=%s" % [lobby, response])
@@ -93,13 +77,15 @@ func _on_lobby_joined(lobby: int, _permissions: int, _locked: bool, response: in
 			print("Joined own lobby as host")
 			# Host is already connected as peer 1 in _create_host()
 		else:
-			# We are a client - connect to the host
-			print("Connecting client to socket...")
-			connect_socket(lobby_owner_id)
+			# Connect signal for client to know when connected to server
+			if not multiplayer.connected_to_server.is_connected(_on_connected_to_server):
+				multiplayer.connected_to_server.connect(_on_connected_to_server)
+			multiplayer_peer.connect_to_lobby(lobby)
+			multiplayer.multiplayer_peer = multiplayer_peer
 	else:
 		var fail_reason = _get_lobby_join_failure_reason(response)
 		push_error("Failed to join lobby: %s" % fail_reason)
-		# Можно добавить сигнал для уведомления UI об ошибке
+		connection_failed.emit(fail_reason)
 
 func _get_lobby_join_failure_reason(response: int) -> String:
 	match response:
@@ -114,18 +100,7 @@ func _get_lobby_join_failure_reason(response: int) -> String:
 		10: return "A user in the lobby has blocked you from joining."
 		11: return "A user you have blocked is in the lobby."
 		_:  return "Unknown error (code: %d)" % response
-	
-func connect_socket(steam_id: int):
-	multiplayer_peer = SteamMultiplayerPeer.new()
-	var error = multiplayer_peer.create_client(steam_id, 0)
-	if error == OK:
-		print("Connecting peer to host...")
-		multiplayer.multiplayer_peer = multiplayer_peer
-		# When connected to server, add self to connected_peers
-		multiplayer.connected_to_server.connect(_on_connected_to_server)
-	else:
-		push_error("Failed to create Steam client: %s" % _get_error_string(error))
-		# Можно добавить сигнал для уведомления UI об ошибке
+
 
 func _on_connected_to_server():
 	var my_id = multiplayer.get_unique_id()
@@ -133,6 +108,7 @@ func _on_connected_to_server():
 	connected_peers.append(my_id)
 	player_ready_status[my_id] = false
 	player_joined_lobby.emit(my_id)
+	client_connected_to_server.emit()
 
 func _get_error_string(error_code: int) -> String:
 	match error_code:
@@ -148,9 +124,6 @@ func _get_error_string(error_code: int) -> String:
 			return "Unknown error (code: %d)" % error_code
 
 func list_lobbies():
-	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
-	# NOTE: If you are using the test app id, you will need to apply a filter on your game name
-	# Otherwise, it may not show up in the lobby list of your clients
 	Steam.addRequestLobbyListStringFilter("name", LOBBY_NAME, Steam.LOBBY_COMPARISON_EQUAL)
 	Steam.requestLobbyList()
 

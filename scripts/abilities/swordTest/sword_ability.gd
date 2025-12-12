@@ -11,6 +11,9 @@ func _init() -> void:
 
 const SWORD_OFFSET_DISTANCE: float = 80.0
 
+func get_upgrade_description() -> String:
+	return "• Быстрее перезарядка\n• Меньше расход выносливости"
+
 func _on_use(user: PlayerBase):
 	var sword: SwordTest = sword_scene.instantiate()
 	sword.get_ready(user.base_damage)

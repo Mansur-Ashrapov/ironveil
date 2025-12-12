@@ -49,5 +49,26 @@ func list_lobbies():
 	active_network.list_lobbies()
 
 func reload_scene_on_disconnect(_id):
-	multiplayer.multiplayer_peer.close()
+	leave_lobby()
 	get_tree().reload_current_scene()
+
+## Покидает текущее лобби и очищает состояние
+func leave_lobby():
+	if active_network and active_network.has_method("leave_lobby"):
+		active_network.leave_lobby()
+	elif multiplayer.multiplayer_peer:
+		multiplayer.multiplayer_peer.close()
+	
+	# Отключаем сигналы
+	if multiplayer.peer_disconnected.is_connected(reload_scene_on_disconnect):
+		multiplayer.peer_disconnected.disconnect(reload_scene_on_disconnect)
+	if multiplayer.server_disconnected.is_connected(reload_scene_on_disconnect):
+		multiplayer.server_disconnected.disconnect(reload_scene_on_disconnect)
+	
+	# Очищаем сеть
+	if active_network:
+		active_network.queue_free()
+		active_network = null
+	
+	MultiplayerManager.host_mode_enabled = false
+	MultiplayerManager.multiplayer_mode_enabled = false

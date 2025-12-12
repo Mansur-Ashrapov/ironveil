@@ -32,6 +32,10 @@ func show_character_select_host():
 	%SteamHUD.hide()
 	%CharacterSelectHUD.show()
 	
+	# Хост может сразу выбирать персонажа
+	_set_character_buttons_enabled(true)
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/Title.text = "Select Character"
+	
 	# Create network and host
 	%NetworkManager.become_host()
 	_connect_network_signals()
@@ -45,6 +49,10 @@ func show_character_select_client():
 	%MultiplayerHUD.hide()
 	%SteamHUD.hide()
 	%CharacterSelectHUD.show()
+	
+	# Отключаем кнопки пока соединение устанавливается
+	_set_character_buttons_enabled(false)
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/Title.text = "Connecting..."
 	
 	# Join as client
 	%NetworkManager.join_as_client(pending_lobby_id)
@@ -64,6 +72,11 @@ func _connect_network_signals():
 			network.player_joined_lobby.connect(_on_player_joined_lobby)
 		if not network.player_left_lobby.is_connected(_on_player_left_lobby):
 			network.player_left_lobby.connect(_on_player_left_lobby)
+		# Сигналы для клиента
+		if network.has_signal("client_connected_to_server") and not network.client_connected_to_server.is_connected(_on_client_connected):
+			network.client_connected_to_server.connect(_on_client_connected)
+		if network.has_signal("connection_failed") and not network.connection_failed.is_connected(_on_connection_failed):
+			network.connection_failed.connect(_on_connection_failed)
 
 func become_host():
 	show_character_select_host()
@@ -215,6 +228,22 @@ func _on_player_joined_lobby(_peer_id: int):
 func _on_player_left_lobby(_peer_id: int):
 	_update_players_list()
 
+func _on_client_connected():
+	print("Client connected to server!")
+	# Включаем кнопки выбора персонажа
+	_set_character_buttons_enabled(true)
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/Title.text = "Select Character"
+
+func _on_connection_failed(reason: String):
+	print("Connection failed: %s" % reason)
+	# Показываем ошибку и возвращаемся в меню
+	push_warning("Connection failed: %s" % reason)
+	_return_to_main_menu()
+
+func _set_character_buttons_enabled(enabled: bool):
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/SwordsmanBtn.disabled = not enabled
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/MagicianBtn.disabled = not enabled
+
 
 var _lobby_match_list_connected: bool = false
 
@@ -242,6 +271,10 @@ func join_lobby(lobby_id = 0):
 	%MultiplayerHUD.hide()
 	%SteamHUD.hide()
 	%CharacterSelectHUD.show()
+	
+	# Отключаем кнопки пока соединение устанавливается
+	_set_character_buttons_enabled(false)
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/Title.text = "Connecting..."
 	
 	# Join as client with lobby id
 	%NetworkManager.join_as_client(lobby_id)
@@ -281,10 +314,52 @@ func _on_lobby_match_list(lobbies: Array):
 
 func _on_restart_pressed() -> void:
 	SoundManager.play_sound("ui_click")
-	var need_to_reload = multiplayer.is_server() or \
-		multiplayer.multiplayer_peer.get_connection_status() == multiplayer.multiplayer_peer.CONNECTION_CONNECTING or \
-		multiplayer.multiplayer_peer.get_connection_status() == multiplayer.multiplayer_peer.CONNECTION_CONNECTING
-	multiplayer.multiplayer_peer.close()
-
-	if need_to_reload:
+	
+	# Проверяем началась ли уже игра
+	var game_started = %GameManager.is_game_started
+	
+	# Корректно покидаем лобби через NetworkManager
+	%NetworkManager.leave_lobby()
+	
+	# Сбрасываем состояние HUD
+	_reset_hud_state()
+	
+	if game_started:
+		# Игра уже началась - нужна полная перезагрузка сцены
 		get_tree().reload_current_scene()
+	else:
+		# Игра ещё не началась - просто возвращаемся в главное меню
+		_return_to_main_menu()
+
+## Возвращает UI в главное меню без перезагрузки сцены
+func _return_to_main_menu():
+	# Скрываем все панели
+	%CharacterSelectHUD.hide()
+	%SteamHUD.hide()
+	$CanvasLayer/waiting_for_players.hide()
+	$CanvasLayer/restart.hide()
+	$CanvasLayer/Label.show()
+	
+	# Показываем главное меню
+	%MultiplayerHUD.show()
+	
+	# Сбрасываем UI выбора персонажа
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/Title.text = "Select Character"
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/SelectedLabel.text = "Selected: None"
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn.disabled = true
+	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn.text = "Ready"
+	_set_character_buttons_enabled(true)
+	
+	# Очищаем список игроков
+	var players_container = $CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/PlayersList
+	for child in players_container.get_children():
+		child.queue_free()
+
+func _reset_hud_state():
+	selected_character = ""
+	is_host_mode = false
+	is_solo_mode = false
+	pending_lobby_id = 0
+	_spawned_players_count = 0
+	_expected_players_count = 0
+	_waiting_for_spawn = false

@@ -35,29 +35,18 @@ func show_upgrade_selection(abilities: Array):
 func _create_ability_button(ability: Ability, idx: int) -> Button:
 	var button = Button.new()
 	
-	var current_cd = ability.get_effective_cooldown()
-	var next_cd = ability.cooldown * max(1.0 - ((ability.ability_level + 1) * Ability.COOLDOWN_REDUCTION_PER_LEVEL), 0.3)
-	
-	var current_mana = ability.get_effective_mana_cost()
-	var next_mana = ability.mana_cost * max(1.0 - ((ability.ability_level + 1) * Ability.COST_REDUCTION_PER_LEVEL), 0.4)
-	
-	var current_stamina = ability.get_effective_stamina_cost()
-	var next_stamina = ability.stamina_cost * max(1.0 - ((ability.ability_level + 1) * Ability.COST_REDUCTION_PER_LEVEL), 0.4)
-	
+	# Заголовок с названием и уровнем
 	var text = "%s [Ур.%d -> %d]\n" % [ability.ability_name, ability.ability_level, ability.ability_level + 1]
-	text += "КД: %.1f -> %.1f  " % [current_cd, next_cd]
 	
-	if ability.mana_cost > 0:
-		text += "МН: %.0f -> %.0f  " % [current_mana, next_mana]
-	if ability.stamina_cost > 0:
-		text += "ВЫН: %.0f -> %.0f" % [current_stamina, next_stamina]
+	# Описание улучшений словами
+	text += ability.get_upgrade_description() + "\n"
 	
 	button.text = text
-	button.custom_minimum_size = Vector2(400, 60)
+	button.custom_minimum_size = Vector2(400, 80)
 	button.pressed.connect(_on_ability_button_pressed.bind(idx))
 	
 	# Стиль кнопки
-	button.add_theme_font_size_override("font_size", 16)
+	button.add_theme_font_size_override("font_size", 14)
 	
 	return button
 

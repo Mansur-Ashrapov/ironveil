@@ -20,6 +20,8 @@ signal player_ready_changed(peer_id: int, is_ready: bool)
 signal all_players_ready()
 signal player_joined_lobby(peer_id: int)
 signal player_left_lobby(peer_id: int)
+signal client_connected_to_server()
+signal connection_failed(reason: String)
 
 func become_host(max_players: int, solo_mode: bool = false):
 	print("Starting host!")
@@ -51,6 +53,7 @@ func _on_connected_to_server():
 	connected_peers.append(my_id)
 	player_ready_status[my_id] = false
 	player_joined_lobby.emit(my_id)
+	client_connected_to_server.emit()
 
 func _on_peer_connected(id: int):
 	print("Peer %s connected to lobby!" % id)

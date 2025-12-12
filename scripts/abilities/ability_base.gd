@@ -36,6 +36,16 @@ func get_effective_stamina_cost() -> float:
 func can_upgrade() -> bool:
 	return ability_level < MAX_LEVEL
 
+# Возвращает текстовое описание улучшений при прокачке
+# Переопределите в наследниках для уникальных описаний
+func get_upgrade_description() -> String:
+	var desc = "• Перезарядка: -%.0f%%\n" % (COOLDOWN_REDUCTION_PER_LEVEL * 100)
+	if mana_cost > 0:
+		desc += "• Стоимость маны: -%.0f%%\n" % (COST_REDUCTION_PER_LEVEL * 100)
+	if stamina_cost > 0:
+		desc += "• Стоимость выносливости: -%.0f%%" % (COST_REDUCTION_PER_LEVEL * 100)
+	return desc
+
 func upgrade() -> bool:
 	if can_upgrade():
 		ability_level += 1

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ckc5nxrmdil2e"]
+[gd_scene load_steps=18 format=3 uid="uid://ckc5nxrmdil2e"]
 
 [ext_resource type="Script" uid="uid://0jtoqbv82fcs" path="res://scripts/player_characters/player_ui.gd" id="1_jkj6h"]
 [ext_resource type="Script" uid="uid://ch414lg3stwmt" path="res://scripts/player_characters/ability_upgrade_ui.gd" id="2_upgrade"]
@@ -23,12 +23,18 @@ corner_radius_bottom_left = 3
 font_size = 20
 font_color = Color(0.73333335, 1, 0, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_8isll"]
+font_size = 15
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_mana"]
 bg_color = Color(0.2, 0.4, 0.9, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+
+[sub_resource type="LabelSettings" id="LabelSettings_bkx2g"]
+font_size = 15
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_stamina"]
 bg_color = Color(0.9, 0.7, 0.2, 1)
@@ -37,12 +43,18 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="LabelSettings" id="LabelSettings_n31oh"]
+font_size = 15
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill_experience"]
 bg_color = Color(0.6, 0.2, 0.9, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+
+[sub_resource type="LabelSettings" id="LabelSettings_wsb5h"]
+font_size = 15
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8isll"]
 atlas = ExtResource("4_8isll")
@@ -67,9 +79,9 @@ respawn_timer_label = NodePath("RespawnTimerLabel")
 z_index = 3
 layout_mode = 3
 anchors_preset = 0
-offset_left = -42.0
+offset_left = -17.0
 offset_top = 474.0
-offset_right = 258.0
+offset_right = 254.345
 offset_bottom = 516.0
 script = ExtResource("3_valuebar")
 label_text = "ЗД:"
@@ -108,12 +120,21 @@ text = "100 / 100"
 label_settings = SubResource("LabelSettings_guxnq")
 horizontal_alignment = 1
 
+[node name="Label" type="Label" parent="hp"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 69.0
+offset_right = 66.0
+offset_bottom = 92.0
+text = "HP"
+label_settings = SubResource("LabelSettings_8isll")
+
 [node name="mp" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_left = -42.0
+offset_left = -17.0
 offset_top = 516.0
-offset_right = 258.0
+offset_right = 254.345
 offset_bottom = 558.0
 script = ExtResource("3_valuebar")
 label_text = "МН:"
@@ -152,12 +173,21 @@ text = "100 / 100"
 label_settings = SubResource("LabelSettings_guxnq")
 horizontal_alignment = 1
 
+[node name="Label" type="Label" parent="mp"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 53.0
+offset_right = 66.0
+offset_bottom = 76.0
+text = "MP"
+label_settings = SubResource("LabelSettings_bkx2g")
+
 [node name="sp" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_left = -42.0
+offset_left = -17.0
 offset_top = 558.0
-offset_right = 258.0
+offset_right = 254.345
 offset_bottom = 600.0
 script = ExtResource("3_valuebar")
 label_text = "ВЫН:"
@@ -196,12 +226,21 @@ text = "100 / 100"
 label_settings = SubResource("LabelSettings_guxnq")
 horizontal_alignment = 1
 
+[node name="Label" type="Label" parent="sp"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 38.0
+offset_right = 66.0
+offset_bottom = 85.0
+text = "ST"
+label_settings = SubResource("LabelSettings_n31oh")
+
 [node name="ep" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
-offset_left = -42.0
+offset_left = -17.0
 offset_top = 600.0
-offset_right = 258.0
+offset_right = 254.345
 offset_bottom = 642.0
 script = ExtResource("3_valuebar")
 label_text = "ОПЫТ:"
@@ -238,6 +277,15 @@ grow_vertical = 2
 text = "0 / 100"
 label_settings = SubResource("LabelSettings_guxnq")
 horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="ep"]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 21.0
+offset_right = 65.0
+offset_bottom = 44.0
+text = "EXP"
+label_settings = SubResource("LabelSettings_wsb5h")
 
 [node name="RespawnTimerLabel" type="Label" parent="."]
 visible = false

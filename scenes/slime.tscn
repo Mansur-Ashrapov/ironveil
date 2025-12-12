@@ -91,7 +91,7 @@ properties/3/spawn = true
 properties/3/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n6pvg"]
-size = Vector2(67, 90)
+size = Vector2(56, 70)
 
 [node name="Slime" type="CharacterBody2D" groups=["mob"]]
 z_index = 3
@@ -102,7 +102,7 @@ script = ExtResource("1_p2gj0")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, 10.999999)
-scale = Vector2(5, 5)
+scale = Vector2(4, 4)
 texture = ExtResource("2_pjw23")
 hframes = 4
 vframes = 3
@@ -120,5 +120,5 @@ replication_config = SubResource("SceneReplicationConfig_n6pvg")
 script = ExtResource("3_n6pvg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0.5, 26)
+position = Vector2(0, 23)
 shape = SubResource("RectangleShape2D_n6pvg")

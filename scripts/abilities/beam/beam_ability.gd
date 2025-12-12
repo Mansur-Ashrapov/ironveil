@@ -11,6 +11,9 @@ func _init() -> void:
 
 const BEAM_OFFSET_DISTANCE: float = 60.0
 
+func get_upgrade_description() -> String:
+	return "• Быстрее перезарядка\n• Меньше расход маны и выносливости"
+
 func use(user: PlayerBase):
 	last_used_time = Time.get_ticks_msec() / 1000.0
 	_on_use(user)

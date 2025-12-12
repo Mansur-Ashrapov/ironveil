@@ -14,7 +14,7 @@ var player_camera: Camera2D
 @export var abilities: Array
 @export var max_health: float = 100.0
 @export var max_stamina: float = 100.0
-@export var max_mana: float = 100.0
+@export var max_mana: float = 10000.0
 @export var base_damage: float = 10.0
 @export var experience: float = 0
 @export var level: int = 0
@@ -29,6 +29,8 @@ var player_camera: Camera2D
 @export var stamina_per_level: float = 20.0
 @export var mana_per_level: float = 20.0
 @export var damage_per_level: float = 5.0
+
+@export var damage_rezistance: float = 0.0
 
 var experience_to_level_up: int = 35
 var abilities_instances: Array
@@ -192,7 +194,7 @@ func take_damage(amount: float):
 	if is_dead:
 		return  # Игрок уже мертв, не обрабатываем урон
 	
-	health -= amount
+	health -= amount * (1 - damage_rezistance)
 	get_hit.emit()
 	
 	# Синхронизируем звук получения урона на всех клиентах

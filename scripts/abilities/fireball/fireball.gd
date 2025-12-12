@@ -62,8 +62,8 @@ func _process_movement(delta: float) -> void:
 		var dir_to_target = (target.global_position - global_position).normalized()
 		direction = direction.lerp(dir_to_target, delta * homing_strength).normalized()
 	
-	# Движение фаербола
-	global_position += direction * speed * delta
+	# Движение фаербола (используем position для синхронизации)
+	position += direction * speed * delta
 
 func _update_target() -> void:
 	# Если цель ещё валидна, не ищем новую
