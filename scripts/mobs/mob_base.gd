@@ -29,6 +29,8 @@ signal moving_to_player()
 signal stop_moving()
 
 func _ready() -> void:
+	add_to_group("damageables")
+	
 	get_hit.connect(animation_cotroller.on_get_hit)
 	moving_to_player.connect(animation_cotroller.moving_to_player)
 	stop_moving.connect(animation_cotroller.stop_moving)
@@ -73,6 +75,9 @@ func get_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
 		await get_tree().create_timer(0.25).timeout
 		death.rpc()
 		
+
+func take_damage(amount: float, damage_source_position: Vector2 = Vector2.ZERO):
+	get_damage(amount, damage_source_position)
 
 func apply_knockback(damage_source_position: Vector2):
 	# Вычисляем направление от источника урона

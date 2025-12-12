@@ -51,6 +51,7 @@ var state_buffer := [] # Буффер передвижений игрока
 func _ready() -> void:
 	# Добавляем игрока в группу для легкого поиска
 	add_to_group("players")
+	add_to_group("damageables")
 	
 	get_hit.connect(animation_controller.on_get_hit)
 	used_ability.connect(animation_controller.on_ability_used)
@@ -133,7 +134,7 @@ func _handle_abilities_input() -> void:
 			if abilities_instances[idx].can_use(mana, stamina):
 				server_use_ability.rpc_id(1, idx)
 
-func take_damage(amount: float):
+func take_damage(amount: float, _damage_source_position: Vector2 = Vector2.ZERO):
 	health -= amount
 	get_hit.emit()
 
