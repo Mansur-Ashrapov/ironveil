@@ -9,7 +9,7 @@
 [sub_resource type="LabelSettings" id="LabelSettings_cc156"]
 font_size = 29
 
-[node name="steam" type="Node2D" groups=["root"]]
+[node name="steam" type="Node2D" groups=["level_tilemap", "root"]]
 
 [node name="GameManager" type="Node" parent="."]
 unique_name_in_owner = true

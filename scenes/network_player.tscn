@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://ckc5nxrmdil2e" path="res://scenes/player_ui.tscn" id="3_rhx3x"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_27uls"]
-size = Vector2(60, 71)
+size = Vector2(60, 70)
 
 [sub_resource type="Animation" id="Animation_kfj5c"]
 length = 0.001
@@ -141,7 +141,7 @@ vframes = 3
 region_rect = Rect2(0, 0, 8, 8)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(1, 4.5)
+position = Vector2(0, 5)
 shape = SubResource("RectangleShape2D_27uls")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]

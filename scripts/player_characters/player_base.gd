@@ -48,8 +48,11 @@ signal changed_direction(new_diretion: Vector2)
 var state_buffer := [] # Буффер передвижений игрока
 
 
+
 func _ready() -> void:
 	# Добавляем игрока в группу для легкого поиска
+	print("Killzone spikes READY, server =", multiplayer.is_server())
+
 	add_to_group("players")
 	add_to_group("damageables")
 	
@@ -104,11 +107,11 @@ func _process(_delta: float) -> void:
 		velocity = direction * SPEED
 		_flip_sprite()
 		
-	_spike_check_timer -= _delta
-	_spike_hit_cooldown -= _delta
-	if _spike_check_timer <= 0.0:
-		_spike_check_timer = spike_check_interval
-		_check_spike_underfoot()
+	#_spike_check_timer -= _delta
+	#_spike_hit_cooldown -= _delta
+	#if _spike_check_timer <= 0.0:
+		#_spike_check_timer = spike_check_interval
+		#_check_spike_underfoot()
 	
 	move_and_slide()
 	
@@ -186,74 +189,95 @@ func sync_parametrs(new_health: float, new_mana: float, new_stamina: float, new_
 	level = new_lvl
 	parametrs_changed.emit(new_health, new_mana, new_stamina, new_expirience, new_lvl)
 	
-func _find_level_tilemap() -> TileMap:
-	var nodes = get_tree().get_nodes_in_group("level_tilemap")
-	if nodes.size() == 0:
-		return null
-	return nodes[0] as TileMap
+#func _find_level_tilemap() -> TileMap:
+	#var nodes = get_tree().get_nodes_in_group("level_tilemap")
+	#if nodes.size() == 0:
+		#return null
+	#return nodes[0] as TileMap
 	
-func _check_spike_underfoot() -> void:
-	# Не проверяем если уже в кулдауне
-	if _spike_hit_cooldown > 0.0:
-		return
+#func _check_spike_underfoot() -> void:
+	## Не проверяем если уже в кулдауне
+	#if _spike_hit_cooldown > 0.0:
+		#return
+#
+	##var tilemap: TileMap = _find_level_tilemap()
+	##if not tilemap:
+		##return
+#
+	#var spike_maps := get_tree().get_nodes_in_group("spike_maps")
+	#if spike_maps.is_empty():
+		#return
+#
+	#for tilemap in spike_maps:
+		#if not tilemap is TileMap:
+			#continue
+#
+		## Переводим мировую позицию игрока в координаты тайла
+		#var map_pos = tilemap.local_to_map(global_position)
+		#
+		#var tile_data: TileData = tilemap.get_cell_tile_data(0, map_pos)
+		#if tile_data == null:
+			#continue
+#
+		#if not tile_data.get_custom_data("is_spike"):
+			#continue
+#
+	##if not tile_data.get("is_spike", false):
+		##return
+#
+		## Получили параметры шипа
+		#var damage := float(tile_data.get_custom_data("damage"))
+		#var knockback_power := float(tile_data.get_custom_data("knockback"))
+		#var cooldown := float(tile_data.get_custom_data("cooldown"))
+#
+		## направление нокбэка: от центра тайла к игроку
+		#var tile_world_pos = tilemap.map_to_local(map_pos) + tilemap.tile_set.tile_size * 0.5
+		#var kb_dir = (global_position - tile_world_pos).normalized()
+		#var kb_vec = kb_dir * knockback_power
+#
+		## Запрос серверу (сервер — peer id 1 в твоём проекте). Клиент-владелец вызывает rpc_id(1,...)
+		## Если ты используешь другой id хоста — подставь корректный.
+		#rpc_id(1, "server_apply_spike_damage", damage, kb_vec)
+#
+		## локальный кулдаун, чтобы не спамить rpc
+		#_spike_hit_cooldown = cooldown
+		#return
 
-	var tilemap: TileMap = _find_level_tilemap()
-	if not tilemap:
-		return
 
-	# Переводим мировую позицию игрока в координаты тайла
-	var map_pos = tilemap.world_to_map(global_position)
-	# Получаем source id тайла (слой 0)
-	var source_id = tilemap.get_cell_source_id(0, map_pos)
-	if source_id == -1:
-		return
+#@rpc("any_peer", "reliable")
+#func server_apply_spike_damage(amount: float, knockback: Vector2) -> void:
+	## Выполняем только на сервере
+	#if not multiplayer.is_server():
+		#return
+#
+	#var spike_maps := get_tree().get_nodes_in_group("spike_maps")
+#
+	#for tilemap in spike_maps:
+		#if not tilemap is TileMap:
+			#continue
+			#
+		#var map_pos = tilemap.local_to_map(global_position)
+#
+		#var tile_data: TileData = tilemap.get_cell_tile_data(0, map_pos)
+		#if tile_data == null:
+			#continue
+			#
+		#if tile_data.get_custom_data("is_spike"):
+			#take_damage(amount)
+			#velocity += knockback
+			#return
 
-	var tile_source = tilemap.tile_set.get_source(source_id)
-	if not tile_source:
-		return
-
-	var tile_data = tile_source.get_custom_data()
-	if not tile_data:
-		return
-
-	if not tile_data.get("is_spike", false):
-		return
-
-	# Получили параметры шипа
-	var damage = float(tile_data.get("damage", 10))
-	var knockback_power = float(tile_data.get("knockback", 200.0))
-	var cooldown = float(tile_data.get("cooldown", 0.5))
-
-	# направление нокбэка: от центра тайла к игроку
-	var tile_world_pos = tilemap.map_to_world(map_pos) + tilemap.cell_size * 0.5
-	var kb_dir = (global_position - tile_world_pos).normalized()
-	var kb_vec = kb_dir * knockback_power
-
-	# Запрос серверу (сервер — peer id 1 в твоём проекте). Клиент-владелец вызывает rpc_id(1,...)
-	# Если ты используешь другой id хоста — подставь корректный.
-	rpc_id(1, "server_apply_spike_damage", damage, kb_vec, global_position)
-
-	# локальный кулдаун, чтобы не спамить rpc
-	_spike_hit_cooldown = cooldown
-
-
-@rpc("any_peer", "reliable")
-func server_apply_spike_damage(amount: float, knockback: Vector2, source_pos: Vector2) -> void:
-	# Выполняем только на сервере
-	if not multiplayer.is_server():
-		return
-
-	# Безопасная проверка: убедимся, что сервер в своей копии действительно стоит на шипе
-	var tilemap: TileMap = _find_level_tilemap()
-	if tilemap:
-		var map_pos = tilemap.world_to_map(global_position)
-		var source_id = tilemap.get_cell_source_id(0, map_pos)
-		if source_id != -1:
-			var tile_source = tilemap.tile_set.get_source(source_id)
-			var tile_data = tile_source.get_custom_data()
-			if tile_data and tile_data.get("is_spike", false):
-				# Применяем урон и нокбэк на серверной копии
-				# take_damage есть в твоём файле — он уменьшает health и вызывает sync_parametrs.rpc
-				take_damage(amount)
-				# применим нокбэк к velocity (CharacterBody2D)
-				velocity += knockback
+	## Безопасная проверка: убедимся, что сервер в своей копии действительно стоит на шипе
+	#var tilemap: TileMap = _find_level_tilemap()
+	#if tilemap:
+		#var map_pos = tilemap.local_to_map(global_position)
+		#var source_id = tilemap.get_cell_source_id(0, map_pos)
+		#if source_id != -1:
+			#var tile_source = tilemap.tile_set.get_source(source_id)
+			#var tile_data = tile_source.get_custom_data()
+			#if tile_data and tile_data.get("is_spike", false):
+				## Применяем урон и нокбэк на серверной копии
+				## take_damage есть в твоём файле — он уменьшает health и вызывает sync_parametrs.rpc
+				#take_damage(amount)
+				## применим нокбэк к velocity (CharacterBody2D)
+				#velocity += knockback
