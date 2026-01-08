@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cwgldckefibmk"]
+[gd_scene load_steps=16 format=3 uid="uid://cwgldckefibmk"]
 
 [ext_resource type="Script" uid="uid://bysdxbf14gpdh" path="res://scripts/game_manager.gd" id="1_cc156"]
 [ext_resource type="Script" uid="uid://b542tgewywoyv" path="res://scripts/multiplayer_hud.gd" id="1_cw38t"]
@@ -28,6 +28,13 @@ font_size = 8
 [sub_resource type="AtlasTexture" id="AtlasTexture_5lcxu"]
 atlas = ExtResource("3_5lcxu")
 region = Rect2(31.999647, 31.989338, 96.04585, 64.01529)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_steam_dialog"]
+atlas = ExtResource("3_5lcxu")
+region = Rect2(31.917051, 31.96077, 96.149216, 64.05053)
+
+[sub_resource type="LabelSettings" id="LabelSettings_steam_dialog"]
+font_size = 10
 
 [node name="steam" type="Node2D" groups=["root"]]
 
@@ -258,12 +265,13 @@ offset_left = 243.6
 offset_top = 3.9999983
 offset_right = 621.6
 offset_bottom = 209.0
-text = "Swordsman - ближник, атакует мечем и 
-агрит мобов на себя, получая дополнительный
-резист к урону
+text = "Выберите персонажа
 
-Magician - дальник, атакует фаерболом и 
-бластером"
+Swordsman - воин ближнего боя
+с высокой защитой и провокацией
+
+Magician - маг дальнего боя
+с мощными атакующими заклинаниями"
 label_settings = SubResource("LabelSettings_b3d1v")
 
 [node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/CharacterSelectHUD"]
@@ -334,6 +342,109 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 8
 disabled = true
 text = "Ready"
+
+[node name="SteamNotAvailableDialog" type="Control" parent="HUD/CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 59.0
+offset_top = 70.0
+offset_right = 271.0
+offset_bottom = 220.0
+scale = Vector2(2.4482765, 2.6173155)
+
+[node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/SteamNotAvailableDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.2253513
+offset_top = -2.2924252
+offset_right = -17.985962
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_steam_dialog")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/SteamNotAvailableDialog/Panel"]
+layout_mode = 0
+offset_left = 9.8028145
+offset_top = 12.99041
+offset_right = 186.25381
+offset_bottom = 130.0
+
+[node name="Title" type="Label" parent="HUD/CanvasLayer/SteamNotAvailableDialog/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Steam not running"
+label_settings = SubResource("LabelSettings_steam_dialog")
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="HUD/CanvasLayer/SteamNotAvailableDialog/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "Steam is not running.
+What would you like to do?"
+horizontal_alignment = 1
+
+[node name="QuitAndLaunchSteamBtn" type="Button" parent="HUD/CanvasLayer/SteamNotAvailableDialog/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Quit and launch Steam"
+
+[node name="ContinueWithoutSteamBtn" type="Button" parent="HUD/CanvasLayer/SteamNotAvailableDialog/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Continue without Steam"
+
+[node name="VictoryHUD" type="Control" parent="HUD/CanvasLayer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="TextureRect" parent="HUD/CanvasLayer/VictoryHUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_b3d1v")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/CanvasLayer/VictoryHUD/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="VictoryLabel" type="Label" parent="HUD/CanvasLayer/VictoryHUD/Panel/VBoxContainer"]
+layout_mode = 2
+text = "VICTORY!"
+label_settings = SubResource("LabelSettings_cc156")
+horizontal_alignment = 1
+
+[node name="ReturnToMenuBtn" type="Button" parent="HUD/CanvasLayer/VictoryHUD/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Return to Menu"
 
 [node name="NetworkManager" type="Node" parent="." node_paths=PackedStringArray("players_spawn_node")]
 unique_name_in_owner = true
@@ -454,3 +565,6 @@ position = Vector2(4793, 2098)
 [connection signal="pressed" from="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/SwordsmanBtn" to="HUD" method="select_swordsman"]
 [connection signal="pressed" from="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/CharacterButtons/MagicianBtn" to="HUD" method="select_magician"]
 [connection signal="pressed" from="HUD/CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn" to="HUD" method="on_ready_pressed"]
+[connection signal="pressed" from="HUD/CanvasLayer/SteamNotAvailableDialog/Panel/VBoxContainer/QuitAndLaunchSteamBtn" to="HUD" method="_on_quit_and_launch_steam"]
+[connection signal="pressed" from="HUD/CanvasLayer/SteamNotAvailableDialog/Panel/VBoxContainer/ContinueWithoutSteamBtn" to="HUD" method="_on_continue_without_steam"]
+[connection signal="pressed" from="HUD/CanvasLayer/VictoryHUD/Panel/VBoxContainer/ReturnToMenuBtn" to="HUD" method="_on_return_to_menu_pressed"]

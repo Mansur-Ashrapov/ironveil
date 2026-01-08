@@ -5,9 +5,9 @@ var beam_scene: PackedScene = preload("res://scenes/beam.tscn")
 
 func _init() -> void:
 	ability_name = "Beam"
-	cooldown = 2.5
-	stamina_cost = 10
-	mana_cost = 25
+	cooldown = 4
+	stamina_cost = 5
+	mana_cost = 30
 
 const BEAM_OFFSET_DISTANCE: float = 60.0
 

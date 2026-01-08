@@ -1,7 +1,7 @@
 extends CharacterBody2D
 class_name MobBase
 
-@export var experience_cost: int = 15
+@export var experience_cost: int = 10
 @export var health: float = 30
 @onready var animation_controller: MobBaseAnimationController = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
@@ -28,6 +28,11 @@ var knockback_timer: float = 0.0
 # Система принудительного агро
 var forced_target_player: Node2D = null
 var forced_aggro_timer: float = -1.0  # -1 означает отсутствие принудительного агро
+
+# Система урона от шипов
+var _spike_check_timer: float = 0.0
+var _spike_hit_cooldown: float = 0.0
+const SPIKE_CHECK_INTERVAL: float = 0.06
 
 signal get_hit()
 signal moving_to_player()
@@ -152,6 +157,9 @@ func mob_movement(delta: float):
 	_update_forced_aggro_timer(delta)
 	_validate_forced_target()
 	
+	# Проверка урона от шипов
+	_check_spike_damage(delta)
+	
 	if _handle_knockback(delta):
 		return
 	
@@ -241,3 +249,96 @@ func _move_towards_target() -> void:
 func _stop_movement() -> void:
 	velocity = Vector2.ZERO
 	stop_moving.emit()
+
+# Проверка урона от шипов
+func _check_spike_damage(delta: float) -> void:
+	# Уменьшаем кулдаун
+	if _spike_hit_cooldown > 0:
+		_spike_hit_cooldown -= delta
+	
+	# Проверяем с заданным интервалом
+	_spike_check_timer += delta
+	if _spike_check_timer < SPIKE_CHECK_INTERVAL:
+		return
+	_spike_check_timer = 0.0
+	
+	# Находим WalkInfront напрямую
+	var tilemap: TileMapLayer = null
+	for node in get_tree().get_nodes_in_group("level_tilemap"):
+		if node is TileMapLayer and node.name == "WalkInfront":
+			tilemap = node
+			break
+	
+	if not tilemap:
+		return
+	
+	# Конвертируем позицию моба в локальные координаты тайлмапа
+	var local_pos = tilemap.to_local(global_position)
+	var tile_pos = tilemap.local_to_map(local_pos)
+	
+	# Получаем данные тайла
+	var tile_data = tilemap.get_cell_tile_data(tile_pos)
+	if not tile_data:
+		return
+	
+	# Проверяем custom data (layer называется "dic")
+	var custom = tile_data.get_custom_data("dic")
+	if not custom or not custom is Dictionary:
+		return
+	
+	# Проверяем, является ли тайл шипом
+	if not custom.get("is_spike", false):
+		return
+	
+	# Проверяем кадр анимации - урон только когда шипы открыты (кадры 2, 3, 4)
+	var source_id = tilemap.get_cell_source_id(tile_pos)
+	var atlas_coords = tilemap.get_cell_atlas_coords(tile_pos)
+	var tile_set = tilemap.tile_set
+	
+	if tile_set and source_id >= 0:
+		var source = tile_set.get_source(source_id) as TileSetAtlasSource
+		if source:
+			var frames_count = source.get_tile_animation_frames_count(atlas_coords)
+			if frames_count > 1:
+				var total_duration: float = 0.0
+				for i in range(frames_count):
+					total_duration += source.get_tile_animation_frame_duration(atlas_coords, i)
+				
+				# Вычисляем текущий кадр на основе времени
+				var time_in_cycle = fmod(Time.get_ticks_msec() / 1000.0, total_duration)
+				var current_frame = 0
+				var accumulated_time: float = 0.0
+				for i in range(frames_count):
+					accumulated_time += source.get_tile_animation_frame_duration(atlas_coords, i)
+					if time_in_cycle < accumulated_time:
+						current_frame = i
+						break
+				
+				# Шипы открыты на кадрах 2, 3, 4 (из 5)
+				if current_frame < 2:
+					return  # Шипы закрыты, не наносим урон
+	
+	# Если кулдаун еще не прошел, не наносим урон
+	if _spike_hit_cooldown > 0:
+		return
+	
+	# Получаем параметры урона из тайла
+	var damage = custom.get("damage", 10.0)
+	var cooldown = custom.get("cooldown", 0.5)
+	var knockback_force = custom.get("knockback", 250.0)
+	
+	# Устанавливаем кулдаун
+	_spike_hit_cooldown = cooldown
+	
+	# Наносим урон (без knockback от внешнего источника, так как шипы под ногами)
+	take_damage(damage, Vector2.ZERO)
+	
+	# Применяем отбрасывание от центра тайла
+	if knockback_force > 0:
+		var tile_center = tilemap.to_global(tilemap.map_to_local(tile_pos))
+		var knockback_dir = (global_position - tile_center).normalized()
+		if knockback_dir == Vector2.ZERO:
+			knockback_dir = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+		knockback_velocity = knockback_dir * knockback_force
+		is_knockback_active = true
+		knockback_timer = KNOCKBACK_DURATION

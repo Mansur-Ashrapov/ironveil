@@ -4,14 +4,14 @@ class_name TauntAbility
 var taunt_effect_scene: PackedScene = preload("res://scenes/taunt_effect.tscn")
 
 @export var taunt_radius: float = 500.0
-@export var taunt_duration: float = 5.0
-@export var resistance_bonus: float = 0.2  # 20% дополнительного сопротивления урону
+@export var taunt_duration: float = 7.0
+@export var resistance_bonus: float = 0.3  # 20% дополнительного сопротивления урону
 
 func _init() -> void:
 	ability_name = "Taunt"
-	cooldown = 10.0
-	stamina_cost = 15.0
-	mana_cost = 10.0
+	cooldown = 14.0
+	stamina_cost = 5
+	mana_cost = 15.0
 
 func get_upgrade_description() -> String:
 	return "• Быстрее перезарядка\n• Меньше расход маны и выносливости"

@@ -21,9 +21,45 @@ func _ready():
 	if spawner:
 		spawner.spawned.connect(_on_player_spawned)
 	
+	# Проверяем доступность Steam при запуске
+	_check_steam_availability()
+	
 func _show_restart_button(text):
 	$CanvasLayer/restart.text = text
 	$CanvasLayer/restart.show()
+
+## Проверяет доступность Steam и показывает диалог если Steam не запущен
+func _check_steam_availability():
+	# Ждем один кадр чтобы SteamManager успел инициализироваться
+	await get_tree().process_frame
+	
+	if not SteamManager.is_steam_initialized:
+		print("Steam is not available, showing dialog...")
+		# Скрываем главное меню и показываем диалог
+		%MultiplayerHUD.hide()
+		$CanvasLayer/Label.hide()
+		%SteamNotAvailableDialog.show()
+	else:
+		print("Steam is available!")
+
+## Обработчик кнопки "Выйти и включить Steam"
+func _on_quit_and_launch_steam():
+	SoundManager.play_sound("ui_click")
+	print("User chose to quit and launch Steam")
+	get_tree().quit()
+
+## Обработчик кнопки "Продолжить без Steam"
+func _on_continue_without_steam():
+	SoundManager.play_sound("ui_click")
+	print("User chose to continue without Steam")
+	%SteamNotAvailableDialog.hide()
+	$CanvasLayer/Label.show()
+	%MultiplayerHUD.show()
+	
+	# Отключаем кнопку Use Steam, т.к. Steam недоступен
+	var use_steam_btn = $CanvasLayer/MultiplayerHUD/Panel/VBoxContainer/UseSteam
+	use_steam_btn.disabled = true
+	use_steam_btn.text = "Steam unavailable"
 
 func show_character_select_host():
 	SoundManager.play_sound("ui_click")
@@ -107,6 +143,7 @@ func select_swordsman():
 	SoundManager.play_sound("ui_click")
 	selected_character = "swordsman"
 	_update_selected_label()
+	_update_ability_description("swordsman")
 	_enable_ready_button()
 	
 	# Send choice to server
@@ -122,6 +159,7 @@ func select_magician():
 	SoundManager.play_sound("ui_click")
 	selected_character = "magician"
 	_update_selected_label()
+	_update_ability_description("magician")
 	_enable_ready_button()
 	
 	# Send choice to server
@@ -132,6 +170,45 @@ func select_magician():
 		else:
 			# Direct call for host or when not yet connected
 			network.register_character_choice("magician")
+
+func _update_ability_description(character: String):
+	var description_label = $CanvasLayer/CharacterSelectHUD/Label
+	match character:
+		"swordsman":
+			description_label.text = """[SWORDSMAN] - Воин ближнего боя
+HP: 100 | Stamina: 120 | Mana: 60
+Базовый урон: 13 | Резист: 10%
+
+[SPACE] Удар мечом
+Быстрая ближняя атака.
+Перезарядка: 0.75с | Выносливость: 10
+
+[RMB] Провокация
+Заставляет врагов в радиусе 500
+атаковать вас на 7 секунд.
+Даёт +30% к сопротивлению урону.
+Перезарядка: 10с | Мана: 15"""
+		"magician":
+			description_label.text = """[MAGICIAN] - Маг дальнего боя
+HP: 70 | Stamina: 75 | Mana: 110
+Базовый урон: 10
+
+[SPACE] Огненный шар
+Запускает снаряд, наносящий урон.
+Перезарядка: 1.5с | Мана: 20
+
+[RMB] Луч
+Мощный дальний луч, наносит
+двойной урон от базового.
+Перезарядка: 4с | Мана: 30"""
+		_:
+			description_label.text = """Выберите персонажа
+
+Swordsman - воин ближнего боя
+с высокой защитой и провокацией
+
+Magician - маг дальнего боя
+с мощными атакующими заклинаниями"""
 
 func on_ready_pressed():
 	SoundManager.play_sound("ui_click")
@@ -379,6 +456,7 @@ func _return_to_main_menu():
 	# Скрываем все панели
 	%CharacterSelectHUD.hide()
 	%SteamHUD.hide()
+	%SteamNotAvailableDialog.hide()
 	$CanvasLayer/waiting_for_players.hide()
 	$CanvasLayer/restart.hide()
 	$CanvasLayer/Label.show()
@@ -392,6 +470,9 @@ func _return_to_main_menu():
 	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn.disabled = true
 	$CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/ReadyBtn.text = "Ready"
 	_set_character_buttons_enabled(true)
+	
+	# Сбрасываем описание способностей
+	_update_ability_description("")
 	
 	# Очищаем список игроков
 	var players_container = $CanvasLayer/CharacterSelectHUD/Panel/VBoxContainer/PlayersList

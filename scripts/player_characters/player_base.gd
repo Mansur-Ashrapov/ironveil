@@ -14,16 +14,16 @@ var player_camera: Camera2D
 @export var abilities: Array
 @export var max_health: float = 100.0
 @export var max_stamina: float = 100.0
-@export var max_mana: float = 10000.0
+@export var max_mana: float = 100.0
 @export var base_damage: float = 10.0
 @export var experience: float = 0
 @export var level: int = 0
 @export var direction: Vector2 = Vector2(1, 0) # направление движения
 @export var game_started: bool = false
 
-@export var health_regen: float = 0.25
-@export var mana_regen: float = 2
-@export var stamina_regen: float = 1.5
+@export var health_regen: float = 0.5
+@export var mana_regen: float = 4
+@export var stamina_regen: float = 4
 
 @export var spike_check_interval: float = 0.06 # как часто проверять тайл (оптимально 60ms)
 var _spike_check_timer: float = 0.0
@@ -132,7 +132,7 @@ func _enter_tree() -> void:
 	else:
 		player_ui.queue_free()
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if not game_started:
 		return
 	# Если игрок мертв, не обрабатываем ввод (на всех клиентах)
@@ -148,6 +148,10 @@ func _process(_delta: float) -> void:
 		velocity = direction * SPEED
 		_flip_sprite()
 	
+	# Проверка урона от шипов (только на сервере)
+	if multiplayer.is_server():
+		_check_spike_damage(delta)
+	
 	move_and_slide()
 
 func _flip_sprite():
@@ -155,6 +159,98 @@ func _flip_sprite():
 		sprite.flip_h = false
 	elif direction.x < 0:
 		sprite.flip_h = true
+
+# Проверка урона от шипов
+func _check_spike_damage(delta: float) -> void:
+	# Уменьшаем кулдаун
+	if _spike_hit_cooldown > 0:
+		_spike_hit_cooldown -= delta
+	
+	# Проверяем с заданным интервалом
+	_spike_check_timer += delta
+	if _spike_check_timer < spike_check_interval:
+		return
+	_spike_check_timer = 0.0
+	
+	# Находим WalkInfront напрямую
+	var tilemap: TileMapLayer = null
+	for node in get_tree().get_nodes_in_group("level_tilemap"):
+		if node is TileMapLayer and node.name == "WalkInfront":
+			tilemap = node
+			break
+	
+	if not tilemap:
+		return
+	
+	# Конвертируем позицию игрока в локальные координаты тайлмапа
+	var local_pos = tilemap.to_local(global_position)
+	var tile_pos = tilemap.local_to_map(local_pos)
+	
+	# Получаем данные тайла
+	var tile_data = tilemap.get_cell_tile_data(tile_pos)
+	if not tile_data:
+		return
+	
+	# Проверяем custom data (layer называется "dic")
+	var custom = tile_data.get_custom_data("dic")
+	
+	if not custom or not custom is Dictionary:
+		return
+	
+	# Проверяем, является ли тайл шипом
+	if not custom.get("is_spike", false):
+		return
+	
+	# Проверяем кадр анимации - урон только когда шипы открыты (кадры 2, 3, 4)
+	var source_id = tilemap.get_cell_source_id(tile_pos)
+	var atlas_coords = tilemap.get_cell_atlas_coords(tile_pos)
+	var tile_set = tilemap.tile_set
+	
+	if tile_set and source_id >= 0:
+		var source = tile_set.get_source(source_id) as TileSetAtlasSource
+		if source:
+			var frames_count = source.get_tile_animation_frames_count(atlas_coords)
+			if frames_count > 1:
+				var total_duration: float = 0.0
+				for i in range(frames_count):
+					total_duration += source.get_tile_animation_frame_duration(atlas_coords, i)
+				
+				# Вычисляем текущий кадр на основе времени
+				var time_in_cycle = fmod(Time.get_ticks_msec() / 1000.0, total_duration)
+				var current_frame = 0
+				var accumulated_time: float = 0.0
+				for i in range(frames_count):
+					accumulated_time += source.get_tile_animation_frame_duration(atlas_coords, i)
+					if time_in_cycle < accumulated_time:
+						current_frame = i
+						break
+				
+				# Шипы открыты на кадрах 2, 3, 4 (из 5)
+				if current_frame < 2:
+					return  # Шипы закрыты, не наносим урон
+	
+	# Если кулдаун еще не прошел, не наносим урон
+	if _spike_hit_cooldown > 0:
+		return
+	
+	# Получаем параметры урона из тайла
+	var damage = custom.get("damage", 10.0)
+	var cooldown = custom.get("cooldown", 0.5)
+	var knockback_force = custom.get("knockback", 250.0)
+	
+	# Устанавливаем кулдаун
+	_spike_hit_cooldown = cooldown
+	
+	# Наносим урон
+	take_damage(damage)
+	
+	# Применяем отбрасывание
+	if knockback_force > 0:
+		var tile_center = tilemap.to_global(tilemap.map_to_local(tile_pos))
+		var knockback_dir = (global_position - tile_center).normalized()
+		if knockback_dir == Vector2.ZERO:
+			knockback_dir = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+		velocity = knockback_dir * knockback_force
 
 # Вспомогательный метод для расчета направления и позиции способностей
 # Возвращает словарь с direction и position
@@ -443,4 +539,3 @@ func respawn_player():
 @rpc("any_peer", "reliable", "call_local")
 func sync_respawn_position(new_position: Vector2):
 	global_position = new_position
-

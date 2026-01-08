@@ -153,6 +153,9 @@ player_ui = NodePath("Control")
 animation_controller = NodePath("AnimationPlayer")
 sprite = NodePath("Char-sheet")
 abilities = [ExtResource("2_271o3"), ExtResource("3_nhnfk")]
+max_stamina = 120.0
+max_mana = 60.0
+base_damage = 13.0
 damage_rezistance = 0.1
 
 [node name="Control" parent="." instance=ExtResource("4_aiyw0")]

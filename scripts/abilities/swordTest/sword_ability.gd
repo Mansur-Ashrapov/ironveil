@@ -5,8 +5,8 @@ var sword_scene: PackedScene = preload("res://scenes/sword_test.tscn")
 
 func _init() -> void:
 	ability_name = "Sword"
-	cooldown = 0.7
-	stamina_cost = 5
+	cooldown = 0.75
+	stamina_cost = 10
 	mana_cost = 0
 
 const SWORD_OFFSET_DISTANCE: float = 80.0

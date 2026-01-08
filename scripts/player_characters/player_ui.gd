@@ -6,6 +6,7 @@ extends CanvasLayer
 @export var experience_bar: ValueBar
 @export var ability_upgrade_ui: AbilityUpgradeUI
 @export var respawn_timer_label: Label
+@export var boss_direction_indicator: BossDirectionIndicator
 
 var player: PlayerBase
 
@@ -27,6 +28,10 @@ func setup(player_ref: PlayerBase):
 		mana_bar.set_max_value(player.max_mana)
 	if player and experience_bar:
 		experience_bar.set_max_value(player.experience_to_level_up)
+	
+	# Настраиваем индикатор направления к боссу
+	if boss_direction_indicator:
+		boss_direction_indicator.setup(player)
 
 func _on_show_ability_upgrade_ui(abilities: Array):
 	if ability_upgrade_ui:
